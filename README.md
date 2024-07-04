@@ -26,6 +26,7 @@
 <?php
 
 require_once("SMSService.php");
+
 // יצירת אובייקט SMSService
 $smsService = new SMSService();
 
