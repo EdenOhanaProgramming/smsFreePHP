@@ -25,9 +25,7 @@
 ```php
 <?php
 
-use App\Services\SMSService;
-use App\Services\smsAuthDetails;
-
+require_once("SMSService.php");
 // יצירת אובייקט SMSService
 $smsService = new SMSService();
 
