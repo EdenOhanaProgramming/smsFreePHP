@@ -29,12 +29,11 @@ require_once("SMSService.php");
 
 // יצירת אובייקט SMSService
 $smsService = new SMSService();
-
-// יצירת אובייקט smsAuthDetails עם פרטי האימות שלך
-$authDetails = new smsAuthDetails("שם_משתמש", "סיסמה", "API_טוקן");
+// התחברות עם הפרטים
+$smsService->smsAuth("username", "password", "api_key");
 
 // שליחת הודעת SMS
-$result = $smsService->sendSMS($authDetails, "שולח", ["מספר_יעד"], "טקסט_של_הודעה");
+$result = $smsService->sendSMS("sender", ["phone1","phone2"], "message");
 
 // בדיקת תוצאה
 if ($result === true) {
