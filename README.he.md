@@ -40,19 +40,6 @@ SMS, טיפול במספרי טלפון ישראליים ויצירת קודי �
 composer require edenohana/sms-free-php
 ```
 
-כל עוד החבילה לא רשומה ב-Packagist, אפשר להפנות את Composer ישירות לריפו:
-
-```json
-{
-    "repositories": [
-        { "type": "vcs", "url": "https://github.com/EdenOhanaProgramming/smsFreePHP" }
-    ],
-    "require": {
-        "edenohana/sms-free-php": "^2.0"
-    }
-}
-```
-
 לא עובדים עם Composer? מעתיקים את התיקייה לפרויקט וטוענים את ה-autoloader המצורף:
 
 ```php

@@ -44,19 +44,6 @@ And credentials are secrets: they never reach an exception message, and they're 
 composer require edenohana/sms-free-php
 ```
 
-Until the package is listed on Packagist, point Composer at the repository directly:
-
-```json
-{
-    "repositories": [
-        { "type": "vcs", "url": "https://github.com/EdenOhanaProgramming/smsFreePHP" }
-    ],
-    "require": {
-        "edenohana/sms-free-php": "^2.0"
-    }
-}
-```
-
 Not using Composer? Copy the folder into your project and require the bundled autoloader:
 
 ```php
