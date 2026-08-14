@@ -66,7 +66,7 @@ Immutable configuration. Every `with*()` method returns a modified copy.
 | `maxMessageLength` | `134` characters | The provider's limit. |
 | `truncateLongMessages` | `true` | `false` turns an over-long body into an exception. |
 | `allowInternational` | `false` | `true` accepts non-Israeli recipients. |
-| `invalidRecipients` | `InvalidRecipientPolicy::RejectRequest` | Whether an unparseable recipient rejects the request or is skipped. |
+| `invalidRecipients` | `InvalidRecipientPolicy::SkipInvalid` | Whether an unparseable recipient rejects the request or is skipped. |
 | `caBundlePath` | `null` | For hosts whose PHP has no usable CA store. Must be readable. |
 | `userAgent` | `smsFreePHP/<version>` | Sent with every request. |
 
@@ -143,8 +143,8 @@ A backed enum deciding what an unparseable recipient does to a request.
 
 | Case | Behaviour |
 |---|---|
-| `RejectRequest` (default) | Nothing is sent, nothing is charged, and `InvalidPhoneNumberException` lists every bad entry. |
-| `SkipInvalid` | The valid recipients are sent to; the rest come back from `SendResult::skippedRecipients()`. |
+| `RejectRequest` | Nothing is sent, nothing is charged, and `InvalidPhoneNumberException` lists every bad entry. |
+| `SkipInvalid` (default) | The valid recipients are sent to; the rest come back from `SendResult::skippedRecipients()`. |
 
 Under `SkipInvalid`, a request where *every* recipient is invalid still throws. Sending to nobody is
 never what the caller meant, and a silent success there would hide the problem instead of reporting

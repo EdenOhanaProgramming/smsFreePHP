@@ -6,14 +6,21 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- The default `InvalidRecipientPolicy` is now `SkipInvalid` instead of `RejectRequest`. A list with
+  some bad numbers sends to the valid ones and reports the rest, rather than blocking the whole
+  request. A send to a single invalid number still throws, because there is nobody left to send to.
+  Set `InvalidRecipientPolicy::RejectRequest` explicitly to get the old behaviour.
+
 ## [2.1.0] - 2026-08-14
 
 ### Added
 
-- `InvalidRecipientPolicy`, deciding what an unparseable recipient does to a request. The default
-  `RejectRequest` keeps the 2.0 behaviour; `SkipInvalid` sends to the recipients that are valid and
-  reports the rest through `SendResult::skippedRecipients()`. A request where every recipient is
-  invalid still fails under either policy.
+- `InvalidRecipientPolicy`, deciding what an unparseable recipient does to a request. `SkipInvalid`
+  (the default) sends to the recipients that are valid and reports the rest through
+  `SendResult::skippedRecipients()`. `RejectRequest` blocks the whole request on any bad number.
+  A request where every recipient is invalid still fails under either policy.
 - `ClientOptions::withInvalidRecipientPolicy()`, and an `invalid_recipients` key in the Laravel
   config, settable with `SMS4FREE_INVALID_RECIPIENTS`.
 - `SendResult::skippedRecipients()` and `hasSkippedRecipients()`.

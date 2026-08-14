@@ -17,9 +17,6 @@ enum InvalidRecipientPolicy: string
     /**
      * Reject the whole request. Nothing is sent, nothing is charged, and the
      * exception lists every entry that failed to parse.
-     *
-     * The default, because silently dropping a recipient is the kind of bug
-     * that is only noticed when somebody asks why they never got the message.
      */
     case RejectRequest = 'reject';
 
@@ -27,8 +24,9 @@ enum InvalidRecipientPolicy: string
      * Send to the recipients that are valid, and report the rest through
      * {@see SendResult::skippedRecipients()}.
      *
-     * A request where *every* recipient is invalid still fails: sending to
-     * nobody is never what the caller meant.
+     * The default. A single recipient that fails to parse still throws,
+     * because there is nobody left to send to. The policy only matters when
+     * the list has at least one valid number alongside the bad ones.
      */
     case SkipInvalid = 'skip';
 }

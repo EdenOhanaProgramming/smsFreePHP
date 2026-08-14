@@ -72,9 +72,9 @@ final class SendResult
 
     /**
      * The recipients that could not be parsed and were left out of the
-     * request, exactly as the caller supplied them. Always empty under the
-     * default {@see InvalidRecipientPolicy::RejectRequest}, because that
-     * policy never gets as far as sending.
+     * request, exactly as the caller supplied them. Empty under
+     * {@see InvalidRecipientPolicy::RejectRequest}, because that policy
+     * never gets as far as sending.
      *
      * Worth logging: these are people who expected a message and did not get one.
      *

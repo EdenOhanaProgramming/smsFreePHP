@@ -17,7 +17,7 @@ Talking to the SMS4Free API is one `curl` call. Everything around it is where th
 
 Phone numbers arrive messy. `054-123-4567`, `+972 54 123 4567` and `00972541234567` are the same
 line, so they all get parsed into one canonical form, and anything that isn't a real Israeli mobile
-number is rejected before a request goes out.
+number is skipped and reported, so the rest of the list still goes out.
 
 Hebrew breaks naive string handling. Cutting a message with `substr()` splits a two-byte character
 in half, and counting with `strlen()` reports bytes rather than characters. Everything here is
@@ -123,19 +123,11 @@ if ($invalid !== []) {
 
 ### One bad number in a list of five hundred
 
-By default an unparseable recipient rejects the whole request, which is what you want for a
-verification code: if the number is wrong, sending to nobody is the correct outcome. For a bulk send
-it is the wrong trade, so switch the policy and the message goes to everyone it can:
+By default an unparseable recipient is skipped: the message goes to everyone the library can parse,
+and the rest come back from `SendResult::skippedRecipients()`. A send to a single invalid number
+still throws, because there is nobody left to send to.
 
 ```php
-use EdenOhana\SmsFree\ClientOptions;
-use EdenOhana\SmsFree\InvalidRecipientPolicy;
-
-$client = new Sms4FreeClient(
-    Credentials::fromEnvironment(),
-    (new ClientOptions())->withInvalidRecipientPolicy(InvalidRecipientPolicy::SkipInvalid),
-);
-
 $result = $client->send('MyShop', $rowsFromCsv, $text);
 
 if ($result->hasSkippedRecipients()) {
@@ -146,6 +138,19 @@ if ($result->hasSkippedRecipients()) {
 The skipped values come back exactly as they were supplied, so they can go straight into a report
 for whoever owns the list. A send where *no* recipient survives still throws, because delivering to
 nobody is never what the caller meant.
+
+If you prefer one bad number to block the whole request (useful for OTP flows where the single
+recipient must be valid), switch the policy:
+
+```php
+use EdenOhana\SmsFree\ClientOptions;
+use EdenOhana\SmsFree\InvalidRecipientPolicy;
+
+$client = new Sms4FreeClient(
+    Credentials::fromEnvironment(),
+    (new ClientOptions())->withInvalidRecipientPolicy(InvalidRecipientPolicy::RejectRequest),
+);
+```
 
 Or work with the value object directly:
 
@@ -233,7 +238,7 @@ $client = new Sms4FreeClient(Credentials::fromEnvironment(), $options);
 ```
 
 Defaults: a 5 second connect timeout and a 15 second overall timeout, truncation on, Israeli
-recipients only, an unparseable recipient rejecting the request, and TLS verification always on.
+recipients only, unparseable recipients skipped, and TLS verification always on.
 
 ### A note on retries
 

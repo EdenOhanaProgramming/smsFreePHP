@@ -136,15 +136,15 @@ final class Sms4FreeServiceProvider extends ServiceProvider
     }
 
     /**
-     * An unrecognised value falls back to rejecting the request, because that
-     * is the setting that cannot silently drop somebody's message.
+     * An unrecognised value falls back to skipping, consistent with the
+     * library default.
      *
      * @param array<string, mixed> $config
      */
     private static function invalidRecipientPolicy(array $config): InvalidRecipientPolicy
     {
         return InvalidRecipientPolicy::tryFrom(self::string($config, 'invalid_recipients'))
-            ?? InvalidRecipientPolicy::RejectRequest;
+            ?? InvalidRecipientPolicy::SkipInvalid;
     }
 
     /**
