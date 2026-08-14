@@ -1,0 +1,49 @@
+name: Bug report
+description: Something does not work the way it should
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please remove your username, password and API key from anything you paste.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you expect instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal reproduction
+      description: The smallest snippet that shows the problem.
+      render: php
+    validations:
+      required: true
+
+  - type: input
+    id: php-version
+    attributes:
+      label: PHP version
+      placeholder: "8.3.6"
+    validations:
+      required: true
+
+  - type: input
+    id: library-version
+    attributes:
+      label: smsFreePHP version
+      placeholder: "2.0.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: provider-response
+    attributes:
+      label: Provider response
+      description: If SMS4Free answered, the status code and message it returned.
+    validations:
+      required: false
