@@ -2,8 +2,9 @@
 
 > A typed PHP 8.1+ client for the SMS4Free (sms4free.co.il) HTTP API. It sends SMS, parses and
 > normalises Israeli phone numbers, counts SMS parts for Hebrew (UCS-2) text, and generates
-> one-time passcodes. Composer package `edenohana/sms-free-php`, namespace `EdenOhana\SmsFree`,
-> MIT licensed.
+> one-time passcodes. Ships first-party Laravel support (auto-discovered service provider, facade
+> and notification channel) for Laravel 9 to 12. Composer package `edenohana/sms-free-php`,
+> namespace `EdenOhana\SmsFree`, MIT licensed.
 
 Install with `composer require edenohana/sms-free-php`. Requires PHP >= 8.1 and the `curl`, `json`
 and `mbstring` extensions. Version 1.x exposed a global `SMSService` class; it still ships and still
@@ -23,6 +24,30 @@ $result->acceptedCount();
 `send(string $senderName, iterable|string|PhoneNumber $recipients, string|Message $message)` returns
 a `SendResult` or throws. It normalises and de-duplicates recipients, rejects the whole request if
 any number is unparseable, and truncates an over-long body on a character boundary by default.
+
+## Laravel
+
+The service provider is auto-discovered; `illuminate/*` is a dev dependency only, so nothing changes
+for projects that are not on the framework. Fill in `SMS4FREE_USERNAME`, `SMS4FREE_PASSWORD`,
+`SMS4FREE_API_KEY` and `SMS4FREE_SENDER` in `.env`, then inject `Sms4FreeClient`, call the
+`Sms4Free` facade, or use the notification channel:
+
+```php
+public function via(object $notifiable): array
+{
+    return ['sms4free'];
+}
+
+public function toSms4Free(object $notifiable): string   // or a Sms4FreeMessage, to override the sender
+{
+    return "הקוד שלך לאימות הוא: {$this->code}";
+}
+```
+
+The channel finds the recipient through `routeNotificationForSms4free()`, an Eloquent
+`phone_number` attribute, or a public `phone_number` property, and returns null when there is none.
+Publish the config with `php artisan vendor:publish --tag=sms4free-config`. In tests, bind
+`HttpClient` to a fake rather than mocking the client.
 
 ## Things that are easy to get wrong
 
@@ -45,8 +70,8 @@ any number is unparseable, and truncates an over-long body on a character bounda
   broken CA store.
 - OTP codes are strings, not integers, so leading zeros survive. Compare them with
   `OtpGenerator::matches()`, which is constant time.
-- On Laravel, the service provider is auto-discovered. Use the `sms4free` notification channel with a
-  `toSms4Free()` method on the notification, and bind `HttpClient` to a fake in tests.
+- Sending marketing SMS in Israel requires prior consent under the anti-spam amendment to the
+  Communications Law. Do not generate bulk marketing flows without an opt-in and an opt-out.
 
 ## Docs
 

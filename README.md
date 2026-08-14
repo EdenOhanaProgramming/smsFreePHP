@@ -287,8 +287,25 @@ composer check     # all three
 Bug reports and pull requests are welcome, see [CONTRIBUTING.md](CONTRIBUTING.md). Found a security
 issue? Please follow [SECURITY.md](SECURITY.md) instead of opening a public issue.
 
+## Legal
+
+The MIT licence covers the code, including its "as is" disclaimer: no warranty, and no liability for
+what happens when you use it. Two things it does not cover, both of which sit with whoever sends the
+messages.
+
+**Israeli anti-spam law.** Amendment 40 to the Communications (Telecommunications and Broadcasting)
+Law requires explicit prior consent before an advertising message is sent, an identifiable sender,
+and a working way to opt out. Statutory damages reach ₪1,000 per message without the recipient
+having to prove any loss, so a careless bulk send gets expensive quickly. A transactional message,
+such as a verification code or a delivery update for an order the person placed, is a different
+matter from marketing.
+
+**The provider's terms.** This is an unofficial client. Your account is governed by SMS4Free's own
+terms, and nothing in this package changes what they permit.
+
+smsFreePHP is not affiliated with, endorsed by, or connected to SMS4Free. The name is used only to
+say which API the library speaks to. None of the above is legal advice.
+
 ## License
 
 [MIT](LICENSE) © Eden Ohana
-
-This project is not affiliated with SMS4Free.
