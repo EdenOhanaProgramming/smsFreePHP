@@ -1,0 +1,15 @@
+# Keep the distributed package small: development-only files are not needed
+# by anyone installing this library with Composer.
+/.github/               export-ignore
+/examples/              export-ignore
+/tests/                 export-ignore
+/.editorconfig          export-ignore
+/.gitattributes         export-ignore
+/.gitignore             export-ignore
+/.php-cs-fixer.dist.php export-ignore
+/phpstan.neon.dist      export-ignore
+/phpunit.xml.dist       export-ignore
+/CONTRIBUTING.md        export-ignore
+
+* text=auto eol=lf
+*.php diff=php
