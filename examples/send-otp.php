@@ -7,7 +7,7 @@
  * with a secure random source, stored hashed with an expiry, and compared in
  * constant time. Sending the SMS is the easy half.
  *
- *   SMS4FREE_USERNAME=… SMS4FREE_PASSWORD=… SMS4FREE_API_KEY=… \
+ *   SMS4FREE_USERNAME=... SMS4FREE_PASSWORD=... SMS4FREE_API_KEY=... \
  *     php examples/send-otp.php 054-123-4567
  */
 
@@ -51,7 +51,7 @@ $valid = $challenge['attempts_left'] > 0
     && time() < $challenge['expires_at']
     && password_verify($typed, $challenge['hash']);
 
-echo $valid ? 'Verified ✅' : 'Wrong or expired code ❌', \PHP_EOL;
+echo $valid ? 'Verified.' : 'Wrong or expired code.', \PHP_EOL;
 
 // If you keep the code in plain text instead of a hash, compare it with
 // OtpGenerator::matches(), which is constant time:

@@ -11,7 +11,7 @@ use EdenOhana\SmsFree\Exception\InvalidArgumentException;
  *
  * The defaults are meant to be sensible for a web request: fail fast rather
  * than leaving a page hanging on a provider that has stopped responding.
- * Instances are immutable — the `with*()` methods return a modified copy.
+ * Instances are immutable, and the `with*()` methods return a modified copy.
  */
 final class ClientOptions
 {
@@ -117,7 +117,7 @@ final class ClientOptions
 
     /**
      * When disabled, a body longer than the limit raises an exception instead
-     * of being silently shortened — the safer choice when the tail of the
+     * of being silently shortened. That is the safer choice when the tail of the
      * message carries meaning, such as a link.
      */
     public function withMessageTruncation(bool $truncate): self

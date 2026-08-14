@@ -17,7 +17,7 @@ enum SmsEncoding: string
     /** The 7-bit GSM 03.38 alphabet: Latin letters, digits and common punctuation. */
     case Gsm7 = 'GSM-7';
 
-    /** UTF-16 code units, used as soon as a single character falls outside GSM-7 (Hebrew, Arabic, emoji …). */
+    /** UTF-16 code units, used as soon as a single character falls outside GSM-7 (Hebrew, Arabic, emoji). */
     case Ucs2 = 'UCS-2';
 
     /**

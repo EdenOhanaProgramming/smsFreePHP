@@ -1,6 +1,6 @@
 # Upgrading from 1.x to 2.0
 
-[English](#english) · [עברית](#hebrew)
+[English](#english) | [עברית](#hebrew)
 
 <a name="english"></a>
 
@@ -9,13 +9,13 @@
 ### The short version
 
 **Nothing breaks.** The `SMSService` class still ships, still has the same methods, and still returns
-`true` or a Hebrew error string. Update the package and your existing code keeps working — it will
-just emit one deprecation notice per process.
+`true` or a Hebrew error string. Update the package and your existing code keeps working, with
+one deprecation notice per process.
 
 When you are ready, the new API is a small rewrite:
 
 ```php
-// Before — 1.x
+// Before, in 1.x
 require_once 'SMSService.php';
 
 $sms = new SMSService();
@@ -30,7 +30,7 @@ if ($result === true) {
 ```
 
 ```php
-// After — 2.x
+// After, in 2.x
 use EdenOhana\SmsFree\Credentials;
 use EdenOhana\SmsFree\Exception\SmsFreeException;
 use EdenOhana\SmsFree\Sms4FreeClient;
@@ -39,7 +39,7 @@ $client = new Sms4FreeClient(new Credentials($user, $pass, $key));
 
 try {
     $result = $client->send($sender, [$phone], $text);
-    // sent — and $result knows how many, in how many parts, and whether it was truncated
+    // sent, and $result knows how many, in how many parts, and whether it was truncated
 } catch (SmsFreeException $e) {
     echo $e->getMessage();
 }
@@ -50,8 +50,8 @@ try {
 | 1.x | 2.x |
 |---|---|
 | `new SMSService()` + `smsAuth($u, $p, $k)` | `Sms4FreeClient::create($u, $p, $k)`, or `new Sms4FreeClient(new Credentials(...))` |
-| `sendSMS($sender, $to, $text)` | `send($sender, $to, $text)` — returns `SendResult`, throws on failure |
-| `generateRandomOTP()` | `(new OtpGenerator())->generate()` — returns a **string**, so leading zeros survive |
+| `sendSMS($sender, $to, $text)` | `send($sender, $to, $text)`, returns `SendResult` and throws on failure |
+| `generateRandomOTP()` | `(new OtpGenerator())->generate()`, returns a **string** so leading zeros survive |
 | `getInvalidPhoneNumbers($list)` | `$client->findInvalidRecipients($list)`, or `PhoneNumber::tryParse()` |
 
 ### Behaviour that changed
@@ -59,8 +59,8 @@ try {
 - **Errors are exceptions, not return values.** Catch `SmsFreeException` for everything, or the four
   specific types when you want to react differently to bad input, a refusal and a network failure.
 - **A multi-recipient send now succeeds.** 1.x compared the provider's status against `1`, so sending
-  to two people — which returns `2` — was reported as an error even though both messages went out.
-- **`+972…` numbers are accepted.** 1.x stripped every non-digit *before* matching its own pattern,
+  to two people, which returns `2`, was reported as an error even though both messages went out.
+- **`+972...` numbers are accepted.** 1.x stripped every non-digit *before* matching its own pattern,
   which meant the `+972` branch of that pattern could never match and every international-format
   number was rejected.
 - **Truncation is multibyte-safe and visible.** 1.x cut the body with `substr()`, which slices a
@@ -79,7 +79,7 @@ try {
 ### Also worth checking in your own code
 
 The 1.x README suggested `if ($result == true)`. With a loose comparison, a non-empty error string is
-also truthy — so that check reported success on every failure. If you have it, make it `=== true`, or
+also truthy, so that check reported success on every failure. If you have it, make it `=== true`, or
 move to the exception-based API where the problem cannot happen.
 
 ---
@@ -91,13 +91,13 @@ move to the exception-based API where the problem cannot happen.
 ### הגרסה הקצרה
 
 **שום דבר לא נשבר.** המחלקה `SMSService` עדיין נשלחת עם החבילה, עדיין עם אותן מתודות, ועדיין מחזירה
-`true` או מחרוזת שגיאה בעברית. אפשר לעדכן את החבילה והקוד הקיים ימשיך לעבוד — רק תופיע התראת
+`true` או מחרוזת שגיאה בעברית. אפשר לעדכן את החבילה והקוד הקיים ימשיך לעבוד, עם התראת
 deprecation אחת לכל תהליך.
 
 וכשמתאים לכם, המעבר ל-API החדש הוא שכתוב קטן:
 
 ```php
-// לפני — 1.x
+// לפני, בגרסה 1.x
 require_once 'SMSService.php';
 
 $sms = new SMSService();
@@ -112,7 +112,7 @@ if ($result === true) {
 ```
 
 ```php
-// אחרי — 2.x
+// אחרי, בגרסה 2.x
 use EdenOhana\SmsFree\Credentials;
 use EdenOhana\SmsFree\Exception\SmsFreeException;
 use EdenOhana\SmsFree\Sms4FreeClient;
@@ -121,7 +121,7 @@ $client = new Sms4FreeClient(new Credentials($user, $pass, $key));
 
 try {
     $result = $client->send($sender, [$phone], $text);
-    // נשלח — ו-$result יודע כמה הודעות, בכמה חלקים, והאם הטקסט קוצר
+    // נשלח, ו-$result יודע כמה הודעות, בכמה חלקים, והאם הטקסט קוצר
 } catch (SmsFreeException $e) {
     echo $e->getMessage();
 }
@@ -132,8 +132,8 @@ try {
 | 1.x | 2.x |
 |---|---|
 | `new SMSService()` ‏+‏ `smsAuth($u, $p, $k)` | `Sms4FreeClient::create($u, $p, $k)`, או `new Sms4FreeClient(new Credentials(...))` |
-| `sendSMS($sender, $to, $text)` | `send($sender, $to, $text)` — מחזירה `SendResult`, וזורקת בכישלון |
-| `generateRandomOTP()` | `(new OtpGenerator())->generate()` — מחזירה **מחרוזת**, כך שאפס מוביל נשמר |
+| `sendSMS($sender, $to, $text)` | `send($sender, $to, $text)`, מחזירה `SendResult` וזורקת בכישלון |
+| `generateRandomOTP()` | `(new OtpGenerator())->generate()`, מחזירה **מחרוזת** כך שאפס מוביל נשמר |
 | `getInvalidPhoneNumbers($list)` | `$client->findInvalidRecipients($list)`, או `PhoneNumber::tryParse()` |
 
 ### מה השתנה בהתנהגות
@@ -141,8 +141,8 @@ try {
 - **שגיאות הן חריגות, לא ערכי החזרה.** אפשר לתפוס `SmsFreeException` אחת לכל דבר, או את ארבעת
   הטיפוסים הספציפיים כשרוצים להגיב אחרת לקלט שגוי, לסירוב של הספק ולתקלת רשת.
 - **שליחה לכמה נמענים סוף סוף מצליחה.** גרסה 1.x השוותה את הסטטוס של הספק ל-`1`, ולכן שליחה לשני
-  אנשים — שמחזירה `2` — דווחה ככישלון למרות ששתי ההודעות יצאו.
-- **מספרים בפורמט `+972…` מתקבלים.** גרסה 1.x הסירה כל תו שאינו ספרה *לפני* ההשוואה לתבנית שלה עצמה,
+  אנשים, שמחזירה `2`, דווחה ככישלון למרות ששתי ההודעות יצאו.
+- **מספרים בפורמט `+972...` מתקבלים.** גרסה 1.x הסירה כל תו שאינו ספרה *לפני* ההשוואה לתבנית שלה עצמה,
   כך שהענף `+972` בתבנית לא יכול היה להתאים אף פעם וכל מספר בפורמט בינלאומי נפסל.
 - **החיתוך בטוח למולטי-בייט וגלוי.** גרסה 1.x חתכה עם `substr()`, שחותך תו עברי באמצע. עכשיו החיתוך
   על גבול תו שלם, ו-`SendResult::wasTruncated()` מדווח שזה קרה. אפשר גם להפוך את זה לשגיאה עם
@@ -158,6 +158,6 @@ try {
 
 ### שווה לבדוק גם בקוד שלכם
 
-ה-README של גרסה 1.x הציע `if ($result == true)`. בהשוואה רופפת גם מחרוזת שגיאה לא ריקה היא truthy —
+ה-README של גרסה 1.x הציע `if ($result == true)`. בהשוואה רופפת גם מחרוזת שגיאה לא ריקה היא truthy,
 כלומר הבדיקה הזו דיווחה על הצלחה בכל כישלון. אם יש לכם אותה בקוד, שנו ל-`=== true`, או עברו ל-API
 מבוסס החריגות שבו הבעיה הזו לא יכולה לקרות.

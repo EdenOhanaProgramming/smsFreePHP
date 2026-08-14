@@ -4,8 +4,8 @@
 
 | Version | Supported |
 |---|---|
-| 2.x | ✅ |
-| 1.x | ❌ — please upgrade, see [UPGRADING.md](UPGRADING.md) |
+| 2.x | Yes |
+| 1.x | No, please upgrade. See [UPGRADING.md](UPGRADING.md) |
 
 ## Reporting a vulnerability
 
@@ -34,6 +34,6 @@ report has been confirmed.
 with `hash_equals()` so a comparison cannot be timed. The parts it cannot do for you:
 
 - Store the code hashed, the way you would a password, not in plain text.
-- Give it a short expiry — a few minutes.
+- Give it a short expiry, a few minutes at most.
 - Limit the number of attempts per code, and rate-limit how often a new code can be requested for the
   same number. Without that, a six-digit code is a million guesses away from anyone patient.

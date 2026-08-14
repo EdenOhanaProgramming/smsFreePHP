@@ -13,7 +13,7 @@ declare(strict_types=1);
  * require_once __DIR__ . '/smsFreePHP/src/autoload.php';
  * ```
  *
- * If Composer *is* in use, this file is harmless — the class is already
+ * If Composer *is* in use, this file is harmless: the class is already
  * loaded by then and the autoloader below never fires.
  */
 spl_autoload_register(static function (string $class): void {

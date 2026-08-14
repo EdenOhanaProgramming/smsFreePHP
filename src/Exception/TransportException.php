@@ -9,7 +9,7 @@ namespace EdenOhana\SmsFree\Exception;
  * DNS failure, TLS failure, timeout, unexpected HTTP status or a body that is
  * not valid JSON.
  *
- * A transport failure says nothing about whether the message was delivered —
+ * A transport failure says nothing about whether the message was delivered:
  * the request may have reached the provider and the response may have been
  * lost on the way back. Treat retries accordingly.
  */

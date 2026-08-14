@@ -1,6 +1,6 @@
 # API reference
 
-[English](api-reference.md) · [עברית](api-reference.he.md) · [← back to the README](../README.md)
+[English](api-reference.md) | [עברית](api-reference.he.md) | [Back to the README](../README.md)
 
 Every class lives in the `EdenOhana\SmsFree` namespace unless stated otherwise.
 
@@ -93,14 +93,14 @@ at the first, and passes already-parsed instances through untouched.
 
 | Method | Example |
 |---|---|
-| `raw()` | `'054-123-4567'` — exactly what was supplied |
-| `national()` | `'0541234567'` — the form sent to the provider |
+| `raw()` | `'054-123-4567'`, exactly what was supplied |
+| `national()` | `'0541234567'`, the form sent to the provider |
 | `e164()` | `'+972541234567'`, or `null` when no country code could be determined |
 | `isIsraeli()` | `true` |
 | `equals(PhoneNumber $other)` | compares canonical forms |
 | `__toString()` | same as `national()` |
 
-Accepted Israeli formats — all of these are the same line:
+Accepted Israeli formats, all of which are the same line:
 
 ```
 0541234567      054-123-4567      054 123 4567      (054) 123-4567
@@ -124,7 +124,7 @@ Message::of(string $text): self   // throws on an empty body or invalid UTF-8
 | Method | Returns | Description |
 |---|---|---|
 | `text()` | `string` | The body. |
-| `length()` | `int` | Characters, as a human counts them — not bytes. |
+| `length()` | `int` | Characters as a human counts them, not bytes. |
 | `encoding()` | `SmsEncoding` | `Gsm7` or `Ucs2`. |
 | `parts()` | `int` | How many SMS parts the network splits this into, i.e. how many credits. |
 | `truncateTo(int $maxLength)` | `self` | Cuts on a character boundary. Returns `$this` when nothing needs cutting. |
@@ -201,9 +201,9 @@ All of them implement `Exception\SmsFreeException`, which extends `Throwable`.
 
 | Class | Extends | Extra methods |
 |---|---|---|
-| `Exception\InvalidArgumentException` | `\InvalidArgumentException` | — |
+| `Exception\InvalidArgumentException` | `\InvalidArgumentException` | none |
 | `Exception\InvalidPhoneNumberException` | the above | `invalidNumbers(): list<string>` |
-| `Exception\TransportException` | `\RuntimeException` | — |
+| `Exception\TransportException` | `\RuntimeException` | none |
 | `Exception\ApiException` | `\RuntimeException` | `status(): int`, `providerMessage(): string` |
 
 `ApiException` deliberately does not translate the provider's status codes into named constants: the
@@ -215,5 +215,5 @@ library never claims to know something it does not.
 ## Legacy: `SMSService`
 
 The 1.x class, kept working on top of the new code and deprecated since 2.0. It uses the old
-contract — `true` on success, a Hebrew error string on failure — and triggers an `E_USER_DEPRECATED`
+contract, `true` on success and a Hebrew error string on failure, and triggers an `E_USER_DEPRECATED`
 notice once per process. See [UPGRADING.md](../UPGRADING.md).

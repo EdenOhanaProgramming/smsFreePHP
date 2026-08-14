@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace EdenOhana\SmsFree\Http;
 
 /**
- * A minimal, immutable view of an HTTP response — everything this library
+ * A minimal, immutable view of an HTTP response: everything this library
  * needs, and nothing more.
  */
 final class HttpResponse

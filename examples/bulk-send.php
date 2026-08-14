@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Sending to a list that came from somewhere messy — a CSV export, a form,
+ * Sending to a list that came from somewhere messy: a CSV export, a form,
  * a database column filled in by hand over several years.
  *
  * The pattern: validate first, report the bad rows, then send to the rest.
  * Validation costs nothing; a rejected request costs a round trip, and in
  * some plans a credit.
  *
- *   SMS4FREE_USERNAME=… SMS4FREE_PASSWORD=… SMS4FREE_API_KEY=… \
+ *   SMS4FREE_USERNAME=... SMS4FREE_PASSWORD=... SMS4FREE_API_KEY=... \
  *     php examples/bulk-send.php
  */
 

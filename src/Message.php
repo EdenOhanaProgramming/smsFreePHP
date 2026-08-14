@@ -12,8 +12,8 @@ use EdenOhana\SmsFree\Exception\InvalidArgumentException;
  * Wrapping the text in a value object buys three things the original string
  * did not give us: the text is validated once, truncation is multibyte-safe
  * (cutting a Hebrew string with `substr()` splits a character in half and
- * produces mojibake), and the caller can ask up front how many SMS parts —
- * and therefore how many credits — the message is going to cost.
+ * produces mojibake), and the caller can ask up front how many SMS parts, and
+ * therefore how many credits, the message is going to cost.
  */
 final class Message implements \Stringable
 {
@@ -58,8 +58,8 @@ final class Message implements \Stringable
     }
 
     /**
-     * How many SMS parts the message is split into on the network — in other
-     * words, how many messages the account is billed for.
+     * How many SMS parts the message is split into on the network, in other
+     * words how many messages the account is billed for.
      */
     public function parts(): int
     {

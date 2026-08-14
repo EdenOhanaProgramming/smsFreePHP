@@ -13,31 +13,31 @@ See [UPGRADING.md](UPGRADING.md).
 
 ### Added
 
-- `Sms4FreeClient` — a namespaced, typed client that returns a `SendResult` and throws typed
+- `Sms4FreeClient`, a namespaced, typed client that returns a `SendResult` and throws typed
   exceptions instead of returning `true` or an error string.
-- `PhoneNumber` — parses and normalises Israeli mobile numbers written in any common format
-  (`054-123-4567`, `+972 54 123 4567`, `00972…`), exposes `national()` and `e164()`, and keeps the
+- `PhoneNumber`, which parses and normalises Israeli mobile numbers written in any common format
+  (`054-123-4567`, `+972 54 123 4567`, `00972...`), exposes `national()` and `e164()`, and keeps the
   raw input for error messages. Optional lenient mode for international numbers.
-- `Message` and `SmsEncoding` — multibyte-safe body handling, GSM-7/UCS-2 detection and SMS part
+- `Message` and `SmsEncoding`, for multibyte-safe body handling, GSM-7/UCS-2 detection and SMS part
   counting, so the cost of a Hebrew message is visible before it is sent.
-- `Credentials` — validated, immutable, and redacted from `var_dump()`; `fromEnvironment()` reads
+- `Credentials`, validated, immutable, and redacted from `var_dump()`; `fromEnvironment()` reads
   `SMS4FREE_USERNAME`, `SMS4FREE_PASSWORD` and `SMS4FREE_API_KEY`.
-- `ClientOptions` — endpoint, timeouts, message-length policy, international recipients, CA bundle
+- `ClientOptions`, covering endpoint, timeouts, message-length policy, international recipients, CA bundle
   and User-Agent, all immutable with `with*()` copies.
-- `SendResult` — accepted count, normalised recipients, whether the body was truncated, and an
+- `SendResult`, carrying the accepted count, normalised recipients, whether the body was truncated, and an
   estimate of the credits consumed.
-- `Otp\OtpGenerator` — configurable length, `random_int()` as the source, string return so leading
+- `Otp\OtpGenerator`, with configurable length, `random_int()` as the source, string return so leading
   zeros survive, and a constant-time `matches()`.
-- `Http\HttpClient` — the transport is now an interface, so the provider can be faked in tests or
+- `Http\HttpClient`. The transport is now an interface, so the provider can be faked in tests or
   replaced with an existing HTTP stack. `Http\CurlHttpClient` is the default.
 - A typed exception hierarchy behind one `SmsFreeException` interface.
-- A PHPUnit suite, PHPStan at level 9, a PHP-CS-Fixer ruleset, and CI across PHP 8.1–8.4.
+- A PHPUnit suite, PHPStan at level 9, a PHP-CS-Fixer ruleset, and CI across PHP 8.1 to 8.4.
 - Documentation in English and Hebrew, a bilingual API reference, and runnable examples.
 - `src/autoload.php`, a standalone PSR-4 autoloader for projects that do not use Composer.
 
 ### Fixed
 
-- **Every `+972…` number was rejected.** `getInvalidPhoneNumbers()` stripped non-digits before
+- **Every `+972...` number was rejected.** `getInvalidPhoneNumbers()` stripped non-digits before
   matching, so the `(\+972)?` branch of its own pattern could never match.
 - **A successful multi-recipient send was reported as a failure.** The response status is the number
   of messages accepted, but it was compared against `1`.
@@ -47,7 +47,7 @@ See [UPGRADING.md](UPGRADING.md).
   bounded snippet of what came back.
 - **Truncation corrupted Hebrew.** `substr($message, 0, 134)` cuts UTF-8 mid-character; truncation
   now happens on a character boundary and is reported through `SendResult::wasTruncated()`.
-- **Invalid numbers were echoed back in a form the user never typed** — the digit-stripped version
+- **Invalid numbers were echoed back in a form the user never typed**: the digit-stripped version
   rather than the original input.
 - **Requests could hang for minutes.** `CURLOPT_CONNECTTIMEOUT` was `0` (wait forever) and
   `CURLOPT_TIMEOUT` was 400 seconds. The defaults are now 5 and 15 seconds.
@@ -60,11 +60,11 @@ See [UPGRADING.md](UPGRADING.md).
 - **The class was global and unnamespaced**, so it collided with any application class of the same
   name.
 - **The documented success check was wrong.** The 1.x README used `if ($result == true)`, and a
-  non-empty error string is truthy under a loose comparison — so failures were reported as successes.
+  non-empty error string is truthy under a loose comparison, so failures were reported as successes.
 
 ### Deprecated
 
-- `SMSService` — still shipped and still behaving exactly as it did in 1.x, now implemented on top of
+- `SMSService`, still shipped and still behaving exactly as it did in 1.x, now implemented on top of
   the new client. It triggers one `E_USER_DEPRECATED` notice per process and will be removed in 3.0.
 
 ### Changed

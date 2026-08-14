@@ -1,6 +1,6 @@
 {
     "name": "edenohana/sms-free-php",
-    "description": "A modern, typed PHP client for the SMS4Free (sms4free.co.il) HTTP API — SMS sending, Israeli phone number handling and OTP generation.",
+    "description": "A modern, typed PHP client for the SMS4Free (sms4free.co.il) HTTP API: SMS sending, Israeli phone number handling and OTP generation.",
     "type": "library",
     "keywords": ["sms", "sms4free", "otp", "israel", "notifications", "php"],
     "homepage": "https://github.com/EdenOhanaProgramming/smsFreePHP",

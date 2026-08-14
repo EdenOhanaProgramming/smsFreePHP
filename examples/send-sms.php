@@ -6,7 +6,7 @@
  * Run it with the account details in the environment, so no secret ever ends
  * up in the source tree:
  *
- *   SMS4FREE_USERNAME=… SMS4FREE_PASSWORD=… SMS4FREE_API_KEY=… \
+ *   SMS4FREE_USERNAME=... SMS4FREE_PASSWORD=... SMS4FREE_API_KEY=... \
  *     php examples/send-sms.php 054-123-4567
  */
 
@@ -33,7 +33,7 @@ try {
     );
 
     printf(
-        "Sent to %s — %d message(s) accepted, %d part(s) each.%s",
+        "Sent to %s: %d message(s) accepted, %d part(s) each.%s",
         implode(', ', $result->recipientNumbers()),
         $result->acceptedCount(),
         $result->message()->parts(),
@@ -44,10 +44,10 @@ try {
         fwrite(\STDERR, 'Heads up: the body was longer than the provider allows and was shortened.' . \PHP_EOL);
     }
 } catch (InvalidPhoneNumberException $e) {
-    // Bad input from the user — worth showing them, and no credit was spent.
+    // Bad input from the user. Worth showing them, and no credit was spent.
     fwrite(\STDERR, 'Invalid number(s): ' . implode(', ', $e->invalidNumbers()) . \PHP_EOL);
 } catch (ApiException $e) {
-    // The provider said no: wrong credentials, no balance, unverified sender…
+    // The provider said no: wrong credentials, no balance, unverified sender.
     fwrite(\STDERR, sprintf('Provider refused (status %d): %s%s', $e->status(), $e->providerMessage(), \PHP_EOL));
 } catch (TransportException $e) {
     // The network, not the message. Safe to surface as "try again later".

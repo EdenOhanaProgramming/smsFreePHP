@@ -9,16 +9,16 @@ use EdenOhana\SmsFree\Exception\InvalidPhoneNumberException;
 /**
  * A parsed, normalised recipient number.
  *
- * Users type phone numbers in every shape imaginable — `054-123-4567`,
+ * Users type phone numbers in every shape imaginable: `054-123-4567`,
  * `+972 54 123 4567`, `00972541234567`. This value object accepts all of them
  * and exposes a single canonical form, so the rest of the library never has to
  * deal with formatting noise.
  *
  * Two parsing modes are supported:
  *
- * - **Israeli mobile (default)** — accepts only numbers that resolve to a valid
+ * - **Israeli mobile (default)** accepts only numbers that resolve to a valid
  *   Israeli mobile line (`05X` followed by seven digits).
- * - **International** — accepts any 7–15 digit number, for accounts that are
+ * - **International** accepts any 7 to 15 digit number, for accounts that are
  *   permitted to send abroad.
  */
 final class PhoneNumber implements \Stringable
@@ -225,12 +225,12 @@ final class PhoneNumber implements \Stringable
      */
     private static function israeliMobileNsn(string $digits, bool $explicitInternational): ?string
     {
-        // `972…` is unambiguous as a country code: no Israeli national number
+        // `972...` is unambiguous as a country code: no Israeli national number
         // begins with those digits.
         if (str_starts_with($digits, self::ISRAEL_COUNTRY_CODE)) {
             $nsn = substr($digits, \strlen(self::ISRAEL_COUNTRY_CODE));
 
-            // `+972 054…` is a common copy/paste mistake — tolerate the
+            // `+972 054...` is a common copy/paste mistake, so tolerate the
             // trunk prefix that should have been dropped.
             $nsn = str_starts_with($nsn, '0') ? substr($nsn, 1) : $nsn;
 

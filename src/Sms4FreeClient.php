@@ -211,7 +211,7 @@ final class Sms4FreeClient
     }
 
     /**
-     * The endpoint normally answers with `{"status": n, "message": "…"}`, but
+     * The endpoint normally answers with `{"status": n, "message": "..."}`, but
      * has been known to reply with a bare number. Accept both.
      *
      * @return array{0: int, 1: string}
@@ -286,6 +286,6 @@ final class Sms4FreeClient
             return '(empty body)';
         }
 
-        return mb_strlen($body) > 200 ? mb_substr($body, 0, 200) . '…' : $body;
+        return mb_strlen($body) > 200 ? mb_substr($body, 0, 200) . '...' : $body;
     }
 }

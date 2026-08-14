@@ -1,6 +1,6 @@
 # תיעוד ה-API
 
-[עברית](api-reference.he.md) · [English](api-reference.md) · [← חזרה ל-README](../README.he.md)
+[עברית](api-reference.he.md) | [English](api-reference.md) | [חזרה ל-README](../README.he.md)
 
 כל המחלקות נמצאות ב-namespace‏ `EdenOhana\SmsFree`, אלא אם צוין אחרת.
 
@@ -30,7 +30,7 @@ new Sms4FreeClient(
 1. שם השולח עובר `trim` ואסור שיהיה ריק.
 2. הנמענים מפוענחים ומנורמלים; **כל** הערכים השגויים מדווחים יחד.
 3. נמענים כפולים מאוחדים, כדי שאף אחד לא יחויב פעמיים באותה קריאה.
-4. גוף ההודעה נבדק, ואם הוא ארוך מהמותר הוא נחתך או נפסל — לפי ההגדרות.
+4. גוף ההודעה נבדק, ואם הוא ארוך מהמותר הוא נחתך או נפסל, לפי ההגדרות.
 5. הבקשה נשלחת כ-JSON, כשהעברית נשארת כמות שהיא ולא מקודדת ל-`\uXXXX`.
 6. סטטוס חיובי בתשובה הופך ל-`SendResult`; כל דבר אחר הופך ל-`ApiException`.
 
@@ -92,14 +92,14 @@ PhoneNumber::parseList(iterable $numbers, bool $allowInternational = false): arr
 
 | מתודה | דוגמה |
 |---|---|
-| `raw()` | `'054-123-4567'` — בדיוק מה שהתקבל |
-| `national()` | `'0541234567'` — הצורה שנשלחת לספק |
+| `raw()` | `'054-123-4567'`, בדיוק מה שהתקבל |
+| `national()` | `'0541234567'`, הצורה שנשלחת לספק |
 | `e164()` | `'+972541234567'`, או `null` כשלא ניתן לקבוע קידומת מדינה |
 | `isIsraeli()` | `true` |
 | `equals(PhoneNumber $other)` | משווה את הצורות הקנוניות |
 | `__toString()` | זהה ל-`national()` |
 
-פורמטים ישראליים שמתקבלים — כולם אותו קו בדיוק:
+פורמטים ישראליים שמתקבלים, כולם אותו קו בדיוק:
 
 ```
 0541234567      054-123-4567      054 123 4567      (054) 123-4567
@@ -122,7 +122,7 @@ Message::of(string $text): self   // זורקת על הודעה ריקה או ע
 | מתודה | מחזירה | תיאור |
 |---|---|---|
 | `text()` | `string` | תוכן ההודעה. |
-| `length()` | `int` | תווים כפי שאדם סופר אותם — לא בייטים. |
+| `length()` | `int` | תווים כפי שאדם סופר אותם, לא בייטים. |
 | `encoding()` | `SmsEncoding` | ‏`Gsm7` או `Ucs2`. |
 | `parts()` | `int` | לכמה חלקים הרשת מפצלת את ההודעה, כלומר כמה קרדיטים. |
 | `truncateTo(int $maxLength)` | `self` | חותכת על גבול תו שלם. מחזירה את `$this` כשאין מה לחתוך. |
@@ -199,18 +199,18 @@ interface HttpClient
 
 | מחלקה | יורשת מ- | מתודות נוספות |
 |---|---|---|
-| `Exception\InvalidArgumentException` | `\InvalidArgumentException` | — |
+| `Exception\InvalidArgumentException` | `\InvalidArgumentException` | אין |
 | `Exception\InvalidPhoneNumberException` | הקודמת | `invalidNumbers(): list<string>` |
-| `Exception\TransportException` | `\RuntimeException` | — |
+| `Exception\TransportException` | `\RuntimeException` | אין |
 | `Exception\ApiException` | `\RuntimeException` | `status(): int`,‏ `providerMessage(): string` |
 
-‏`ApiException` לא מתרגמת את קודי הסטטוס של הספק לקבועים בעלי שם — הספק חופשי לשנות את הטבלה הזו,
+‏`ApiException` לא מתרגמת את קודי הסטטוס של הספק לקבועים בעלי שם. הספק חופשי לשנות את הטבלה הזו,
 והעברת הקוד וההודעה כמות שהם מונעת מהספרייה להתיימר לדעת משהו שהיא לא באמת יודעת.
 
 ---
 
 ## תאימות לאחור: `SMSService`
 
-המחלקה מגרסה 1.x, שממשיכה לעבוד מעל הקוד החדש ומסומנת deprecated מאז 2.0. היא שומרת על החוזה הישן —
-`true` בהצלחה, מחרוזת שגיאה בעברית בכישלון — ומדליקה התראת `E_USER_DEPRECATED` פעם אחת בכל תהליך.
+המחלקה מגרסה 1.x, שממשיכה לעבוד מעל הקוד החדש ומסומנת deprecated מאז 2.0. היא שומרת על החוזה הישן,
+`true` בהצלחה ומחרוזת שגיאה בעברית בכישלון, ומדליקה התראת `E_USER_DEPRECATED` פעם אחת בכל תהליך.
 ראו [UPGRADING.md](../UPGRADING.md).

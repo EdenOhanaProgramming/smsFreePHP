@@ -5,9 +5,9 @@
  *
  * Version 2 moved to a namespaced, exception-based API
  * ({@see \EdenOhana\SmsFree\Sms4FreeClient}). This file keeps the old
- * `SMSService` class working — same method names, same return values — so an
- * existing project can upgrade the library without changing a line of code,
- * and migrate at its own pace.
+ * `SMSService` class working, with the same method names and the same return
+ * values, so an existing project can upgrade the library without changing a
+ * line of code and migrate at its own pace.
  *
  * @deprecated since 2.0, use \EdenOhana\SmsFree\Sms4FreeClient instead.
  *             See UPGRADING.md for the (short) migration guide.
@@ -47,7 +47,7 @@ class SMSService
 
             @trigger_error(
                 'SMSService is deprecated since smsFreePHP 2.0 and will be removed in 3.0. '
-                . 'Use EdenOhana\SmsFree\Sms4FreeClient instead — see UPGRADING.md.',
+                . 'Use EdenOhana\SmsFree\Sms4FreeClient instead, see UPGRADING.md.',
                 \E_USER_DEPRECATED,
             );
         }
