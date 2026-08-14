@@ -111,6 +111,27 @@ final class PhoneNumber implements \Stringable
      */
     public static function parseList(iterable $numbers, bool $allowInternational = false): array
     {
+        [$parsed, $invalid] = self::partition($numbers, $allowInternational);
+
+        if ($invalid !== []) {
+            throw new InvalidPhoneNumberException($invalid);
+        }
+
+        return $parsed;
+    }
+
+    /**
+     * Splits a recipient list into the numbers that parse and the raw values
+     * that do not, without deciding what should happen to the bad ones. Both
+     * lists keep their original order, and entries that are already parsed are
+     * passed through untouched.
+     *
+     * @param iterable<string|self> $numbers
+     *
+     * @return array{0: list<self>, 1: list<string>}
+     */
+    public static function partition(iterable $numbers, bool $allowInternational = false): array
+    {
         $parsed = [];
         $invalid = [];
 
@@ -132,11 +153,7 @@ final class PhoneNumber implements \Stringable
             $parsed[] = $candidate;
         }
 
-        if ($invalid !== []) {
-            throw new InvalidPhoneNumberException($invalid);
-        }
-
-        return $parsed;
+        return [$parsed, $invalid];
     }
 
     /**

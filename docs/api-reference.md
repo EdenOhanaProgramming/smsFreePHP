@@ -66,11 +66,12 @@ Immutable configuration. Every `with*()` method returns a modified copy.
 | `maxMessageLength` | `134` characters | The provider's limit. |
 | `truncateLongMessages` | `true` | `false` turns an over-long body into an exception. |
 | `allowInternational` | `false` | `true` accepts non-Israeli recipients. |
+| `invalidRecipients` | `InvalidRecipientPolicy::RejectRequest` | Whether an unparseable recipient rejects the request or is skipped. |
 | `caBundlePath` | `null` | For hosts whose PHP has no usable CA store. Must be readable. |
 | `userAgent` | `smsFreePHP/<version>` | Sent with every request. |
 
 Withers: `withEndpoint()`, `withTimeouts()`, `withMaxMessageLength()`, `withMessageTruncation()`,
-`withInternationalRecipients()`, `withCaBundlePath()`, `withUserAgent()`.
+`withInternationalRecipients()`, `withInvalidRecipientPolicy()`, `withCaBundlePath()`, `withUserAgent()`.
 
 TLS verification is not configurable. Requests carry account credentials, and there is no acceptable
 reason to send those over an unauthenticated connection; a broken CA store is fixed with
@@ -86,10 +87,14 @@ A parsed, normalised recipient.
 PhoneNumber::parse(string $raw, bool $allowInternational = false): self          // throws
 PhoneNumber::tryParse(string $raw, bool $allowInternational = false): ?self      // returns null
 PhoneNumber::parseList(iterable $numbers, bool $allowInternational = false): array
+PhoneNumber::partition(iterable $numbers, bool $allowInternational = false): array
 ```
 
 `parseList()` reports every invalid entry in one `InvalidPhoneNumberException`, rather than stopping
 at the first, and passes already-parsed instances through untouched.
+
+`partition()` is the same walk without the verdict: it returns `[list<PhoneNumber>, list<string>]`,
+the numbers that parsed and the raw values that did not, both in their original order.
 
 | Method | Example |
 |---|---|
@@ -132,6 +137,21 @@ Message::of(string $text): self   // throws on an empty body or invalid UTF-8
 
 ---
 
+## `InvalidRecipientPolicy`
+
+A backed enum deciding what an unparseable recipient does to a request.
+
+| Case | Behaviour |
+|---|---|
+| `RejectRequest` (default) | Nothing is sent, nothing is charged, and `InvalidPhoneNumberException` lists every bad entry. |
+| `SkipInvalid` | The valid recipients are sent to; the rest come back from `SendResult::skippedRecipients()`. |
+
+Under `SkipInvalid`, a request where *every* recipient is invalid still throws. Sending to nobody is
+never what the caller meant, and a silent success there would hide the problem instead of reporting
+it.
+
+---
+
 ## `SmsEncoding`
 
 A backed enum describing the alphabet a message travels in.
@@ -157,6 +177,8 @@ What `send()` returns.
 | `recipientNumbers()` | `list<string>` | The same, as canonical strings. |
 | `message()` | `Message` | The body as it was actually sent. |
 | `wasTruncated()` | `bool` | Whether the body had to be shortened. |
+| `skippedRecipients()` | `list<string>` | Raw values left out under `SkipInvalid`; empty otherwise. |
+| `hasSkippedRecipients()` | `bool` | Whether anything was left out. |
 | `providerMessage()` | `string` | Any text the provider returned alongside the success. |
 | `estimatedCredits()` | `int` | `parts × recipients`. The provider's billing is authoritative. |
 

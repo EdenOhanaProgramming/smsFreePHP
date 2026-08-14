@@ -8,6 +8,7 @@ use EdenOhana\SmsFree\ClientOptions;
 use EdenOhana\SmsFree\Credentials;
 use EdenOhana\SmsFree\Http\CurlHttpClient;
 use EdenOhana\SmsFree\Http\HttpClient;
+use EdenOhana\SmsFree\InvalidRecipientPolicy;
 use EdenOhana\SmsFree\Sms4FreeClient;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Contracts\Container\Container;
@@ -40,6 +41,7 @@ final class Sms4FreeServiceProvider extends ServiceProvider
                 truncateLongMessages: (bool) ($config['truncate_long_messages'] ?? true),
                 allowInternational: (bool) ($config['allow_international'] ?? false),
                 caBundlePath: self::nullableString($config, 'ca_bundle'),
+                invalidRecipients: self::invalidRecipientPolicy($config),
             );
         });
 
@@ -131,6 +133,18 @@ final class Sms4FreeServiceProvider extends ServiceProvider
         $value = $config[$key] ?? null;
 
         return \is_scalar($value) ? (string) $value : $default;
+    }
+
+    /**
+     * An unrecognised value falls back to rejecting the request, because that
+     * is the setting that cannot silently drop somebody's message.
+     *
+     * @param array<string, mixed> $config
+     */
+    private static function invalidRecipientPolicy(array $config): InvalidRecipientPolicy
+    {
+        return InvalidRecipientPolicy::tryFrom(self::string($config, 'invalid_recipients'))
+            ?? InvalidRecipientPolicy::RejectRequest;
     }
 
     /**

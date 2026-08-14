@@ -60,6 +60,11 @@ final class Sms4FreeClient
      * Duplicate recipients are collapsed, so the same person is never billed
      * for twice in a single call.
      *
+     * An unparseable recipient rejects the whole request by default. Set
+     * {@see ClientOptions::withInvalidRecipientPolicy()} to
+     * {@see InvalidRecipientPolicy::SkipInvalid} to send to the rest instead
+     * and read what was left out from {@see SendResult::skippedRecipients()}.
+     *
      * @param string                        $senderName a verified sender number, or an approved alphanumeric sender ID
      * @param iterable<string|PhoneNumber>|string|PhoneNumber $recipients one recipient or a list of them
      * @param string|Message                $message    the body to deliver
@@ -77,7 +82,7 @@ final class Sms4FreeClient
             throw new InvalidArgumentException('The sender name must not be empty.');
         }
 
-        $parsedRecipients = $this->parseRecipients($recipients);
+        [$parsedRecipients, $skipped] = $this->parseRecipients($recipients);
         $body = $this->prepareBody($message);
 
         $response = $this->httpClient->post(
@@ -89,7 +94,7 @@ final class Sms4FreeClient
             ],
         );
 
-        return $this->interpret($response, $parsedRecipients, $body);
+        return $this->interpret($response, $parsedRecipients, $body, $skipped);
     }
 
     /**
@@ -119,7 +124,7 @@ final class Sms4FreeClient
     /**
      * @param iterable<string|PhoneNumber>|string|PhoneNumber $recipients
      *
-     * @return list<PhoneNumber>
+     * @return array{0: list<PhoneNumber>, 1: list<string>} the recipients to send to, and the raw values left out
      */
     private function parseRecipients(iterable|string|PhoneNumber $recipients): array
     {
@@ -127,13 +132,26 @@ final class Sms4FreeClient
             $recipients = [$recipients];
         }
 
-        $parsed = PhoneNumber::parseList($recipients, $this->options->allowsInternational());
+        [$parsed, $invalid] = PhoneNumber::partition($recipients, $this->options->allowsInternational());
 
-        if ($parsed === []) {
-            throw new InvalidArgumentException('At least one recipient is required.');
+        if ($invalid !== [] && $this->options->invalidRecipientPolicy() === InvalidRecipientPolicy::RejectRequest) {
+            throw new InvalidPhoneNumberException($invalid);
         }
 
-        return self::deduplicate($parsed);
+        $parsed = self::deduplicate($parsed);
+
+        // Skipping the bad ones only makes sense while somebody is left to
+        // send to. A request with nothing in it is a mistake, not a no-op.
+        if ($parsed === []) {
+            throw $invalid === []
+                ? new InvalidArgumentException('At least one recipient is required.')
+                : new InvalidPhoneNumberException(
+                    $invalid,
+                    \sprintf('Not one of the %d recipients could be parsed: %s', \count($invalid), implode(', ', $invalid)),
+                );
+        }
+
+        return [$parsed, $invalid];
     }
 
     private function prepareBody(string|Message $message): Message
@@ -188,8 +206,9 @@ final class Sms4FreeClient
      * exception we can justify.
      *
      * @param list<PhoneNumber> $recipients
+     * @param list<string>      $skipped
      */
-    private function interpret(HttpResponse $response, array $recipients, Message $message): SendResult
+    private function interpret(HttpResponse $response, array $recipients, Message $message, array $skipped): SendResult
     {
         if (!$response->isSuccessful()) {
             throw new TransportException(\sprintf(
@@ -207,7 +226,7 @@ final class Sms4FreeClient
             throw new ApiException($status, $providerMessage);
         }
 
-        return new SendResult($status, $recipients, $message, $providerMessage);
+        return new SendResult($status, $recipients, $message, $providerMessage, $skipped);
     }
 
     /**

@@ -66,11 +66,12 @@ Credentials::fromEnvironment(string $prefix = 'SMS4FREE_'): self
 | `maxMessageLength` | `134` תווים | המגבלה של הספק. |
 | `truncateLongMessages` | `true` | ‏`false` הופך הודעה ארוכה מדי לחריגה. |
 | `allowInternational` | `false` | ‏`true` מאפשר נמענים שאינם ישראליים. |
+| `invalidRecipients` | `InvalidRecipientPolicy::RejectRequest` | האם נמען שלא ניתן לפענוח פוסל את הבקשה או מדולג. |
 | `caBundlePath` | `null` | לשרתים שבהם ל-PHP אין מאגר תעודות שמיש. חייב להיות קריא. |
 | `userAgent` | `smsFreePHP/<version>` | נשלח בכל בקשה. |
 
 מתודות: ‏`withEndpoint()`,‏ `withTimeouts()`,‏ `withMaxMessageLength()`,‏ `withMessageTruncation()`,‏
-`withInternationalRecipients()`,‏ `withCaBundlePath()`,‏ `withUserAgent()`.
+`withInternationalRecipients()`,‏ `withInvalidRecipientPolicy()`,‏ `withCaBundlePath()`,‏ `withUserAgent()`.
 
 אימות TLS אינו ניתן לכיבוי. הבקשות נושאות את פרטי החשבון, ואין סיבה מוצדקת לשלוח אותם על גבי חיבור
 שאף אחד לא אימת; מאגר תעודות שבור נפתר עם `withCaBundlePath()`.
@@ -85,10 +86,14 @@ Credentials::fromEnvironment(string $prefix = 'SMS4FREE_'): self
 PhoneNumber::parse(string $raw, bool $allowInternational = false): self          // זורקת
 PhoneNumber::tryParse(string $raw, bool $allowInternational = false): ?self      // מחזירה null
 PhoneNumber::parseList(iterable $numbers, bool $allowInternational = false): array
+PhoneNumber::partition(iterable $numbers, bool $allowInternational = false): array
 ```
 
 ‏`parseList()` מדווחת על כל הערכים השגויים ב-`InvalidPhoneNumberException` אחת, במקום לעצור בראשון,
 ומעבירה הלאה בלי לגעת מופעים שכבר פוענחו.
+
+‏`partition()` היא אותו מעבר בלי פסק הדין: היא מחזירה `[list<PhoneNumber>, list<string>]`, כלומר
+המספרים שפוענחו והערכים הגולמיים שלא, שניהם בסדר המקורי.
 
 | מתודה | דוגמה |
 |---|---|
@@ -130,6 +135,20 @@ Message::of(string $text): self   // זורקת על הודעה ריקה או ע
 
 ---
 
+## `InvalidRecipientPolicy`
+
+‏enum שקובע מה נמען שלא ניתן לפענוח עושה לבקשה.
+
+| ערך | התנהגות |
+|---|---|
+| `RejectRequest` (ברירת מחדל) | שום דבר לא נשלח, שום דבר לא מחויב, ו-`InvalidPhoneNumberException` מפרטת כל ערך שגוי. |
+| `SkipInvalid` | נשלח לנמענים התקינים; השאר חוזרים מ-`SendResult::skippedRecipients()`. |
+
+תחת `SkipInvalid`, בקשה שבה **כל** הנמענים פסולים עדיין זורקת חריגה. שליחה לאף אחד היא אף פעם לא מה
+שהמתכנת התכוון אליו, והצלחה שקטה שם הייתה מסתירה את הבעיה במקום לדווח עליה.
+
+---
+
 ## `SmsEncoding`
 
 ‏enum שמתאר את הא״ב שבו ההודעה נוסעת.
@@ -155,6 +174,8 @@ Message::of(string $text): self   // זורקת על הודעה ריקה או ע
 | `recipientNumbers()` | `list<string>` | אותו דבר, כמחרוזות קנוניות. |
 | `message()` | `Message` | הגוף כפי שנשלח בפועל. |
 | `wasTruncated()` | `bool` | האם הגוף קוצר. |
+| `skippedRecipients()` | `list<string>` | ערכים גולמיים שדולגו תחת `SkipInvalid`; ריק אחרת. |
+| `hasSkippedRecipients()` | `bool` | האם משהו הושמט. |
 | `providerMessage()` | `string` | טקסט שהספק החזיר יחד עם ההצלחה. |
 | `estimatedCredits()` | `int` | ‏`חלקים × נמענים`. החיוב בפועל אצל הספק הוא הקובע. |
 

@@ -29,6 +29,10 @@ php artisan vendor:publish --tag=sms4free-config
 הוא נוחת ב-`config/sms4free.php` ומכסה את ה-endpoint, שני ה-timeouts, מגבלת אורך ההודעה, האם הודעה
 ארוכה מדי נחתכת או נפסלת, האם מותרים נמענים שאינם ישראליים, ונתיב אופציונלי ל-CA bundle.
 
+לדיוור המוני ההגדרה ששווה להכיר היא `invalid_recipients`. ברירת המחדל היא `reject`, שבה מספר אחד
+שלא ניתן לפענוח מפיל את כל הבקשה. עם `SMS4FREE_INVALID_RECIPIENTS=skip` ההודעה יוצאת לנמענים
+התקינים, והשאר זמינים ב-`SendResult::skippedRecipients()`.
+
 ## שליחה ישירה
 
 מזריקים את הלקוח לאן שצריך:

@@ -6,6 +6,18 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `InvalidRecipientPolicy`, deciding what an unparseable recipient does to a request. The default
+  `RejectRequest` keeps the 2.0 behaviour; `SkipInvalid` sends to the recipients that are valid and
+  reports the rest through `SendResult::skippedRecipients()`. A request where every recipient is
+  invalid still fails under either policy.
+- `ClientOptions::withInvalidRecipientPolicy()`, and an `invalid_recipients` key in the Laravel
+  config, settable with `SMS4FREE_INVALID_RECIPIENTS`.
+- `SendResult::skippedRecipients()` and `hasSkippedRecipients()`.
+- `PhoneNumber::partition()`, which splits a list into the numbers that parse and the raw values
+  that do not, without deciding what should happen to the bad ones.
+
 ## [2.0.0]
 
 A rewrite of the internals with a compatibility layer on top: 1.x code keeps working unchanged.

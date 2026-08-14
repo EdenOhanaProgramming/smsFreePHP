@@ -11,6 +11,7 @@ use EdenOhana\SmsFree\Exception\InvalidArgumentException;
 use EdenOhana\SmsFree\Exception\InvalidPhoneNumberException;
 use EdenOhana\SmsFree\Exception\TransportException;
 use EdenOhana\SmsFree\Http\HttpResponse;
+use EdenOhana\SmsFree\InvalidRecipientPolicy;
 use EdenOhana\SmsFree\Message;
 use EdenOhana\SmsFree\Sms4FreeClient;
 use EdenOhana\SmsFree\Tests\Support\FakeHttpClient;
@@ -254,6 +255,71 @@ final class Sms4FreeClientTest extends TestCase
         self::assertSame(0, $http->requestCount());
     }
 
+    public function testInvalidRecipientsCanBeSkippedInsteadOfRejectingTheRequest(): void
+    {
+        $http = FakeHttpClient::respondingWith(2);
+
+        $result = $this->skipping($http)->send(
+            'MyShop',
+            ['054-123-4567', '03-1234567', '052 111 1111', 'nonsense'],
+            'hello',
+        );
+
+        self::assertSame('0541234567,0521111111', $http->lastPayloadField('recipient'));
+        self::assertSame(['03-1234567', 'nonsense'], $result->skippedRecipients());
+        self::assertTrue($result->hasSkippedRecipients());
+        self::assertSame(2, $result->acceptedCount());
+    }
+
+    /**
+     * Skipping is for salvaging a mostly-good list. A list with nothing usable
+     * in it is a mistake, and sending to nobody must not look like success.
+     */
+    public function testSkippingStillFailsWhenNoRecipientSurvives(): void
+    {
+        $http = FakeHttpClient::respondingWith(1);
+
+        try {
+            $this->skipping($http)->send('MyShop', ['03-1234567', 'nonsense'], 'hello');
+            self::fail('Expected an InvalidPhoneNumberException.');
+        } catch (InvalidPhoneNumberException $e) {
+            self::assertSame(['03-1234567', 'nonsense'], $e->invalidNumbers());
+            self::assertStringContainsString('Not one of the 2 recipients', $e->getMessage());
+        }
+
+        self::assertSame(0, $http->requestCount());
+    }
+
+    public function testTheDefaultPolicyStillRejectsTheWholeRequest(): void
+    {
+        $http = FakeHttpClient::respondingWith(1);
+
+        $this->expectException(InvalidPhoneNumberException::class);
+
+        try {
+            $this->client($http)->send('MyShop', ['0541234567', 'nonsense'], 'hello');
+        } finally {
+            self::assertSame(0, $http->requestCount());
+        }
+    }
+
+    public function testAResultWithoutSkippingReportsAnEmptySkippedList(): void
+    {
+        $result = $this->client(FakeHttpClient::respondingWith(1))
+            ->send('MyShop', ['0541234567'], 'hello');
+
+        self::assertSame([], $result->skippedRecipients());
+        self::assertFalse($result->hasSkippedRecipients());
+    }
+
+    public function testSkippedValuesAreReportedExactlyAsTheyWereSupplied(): void
+    {
+        $result = $this->skipping(FakeHttpClient::respondingWith(1))
+            ->send('MyShop', ['0541234567', '  03-123-4567  '], 'hello');
+
+        self::assertSame(['  03-123-4567  '], $result->skippedRecipients());
+    }
+
     public function testInternationalRecipientsAreOptIn(): void
     {
         $http = FakeHttpClient::respondingWith(1);
@@ -272,6 +338,15 @@ final class Sms4FreeClientTest extends TestCase
     private function client(FakeHttpClient $http): Sms4FreeClient
     {
         return new Sms4FreeClient($this->credentials(), new ClientOptions(), $http);
+    }
+
+    private function skipping(FakeHttpClient $http): Sms4FreeClient
+    {
+        return new Sms4FreeClient(
+            $this->credentials(),
+            (new ClientOptions())->withInvalidRecipientPolicy(InvalidRecipientPolicy::SkipInvalid),
+            $http,
+        );
     }
 
     private function credentials(): Credentials

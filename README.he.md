@@ -116,6 +116,31 @@ if ($invalid !== []) {
 }
 ```
 
+### מספר אחד פסול ברשימה של חמש מאות
+
+כברירת מחדל נמען שלא ניתן לפענוח פוסל את כל הבקשה, וזה בדיוק מה שרוצים בקוד אימות: אם המספר שגוי,
+לא לשלוח לאף אחד היא התוצאה הנכונה. בדיוור המוני זו עסקה גרועה, ולכן משנים את המדיניות וההודעה יוצאת
+לכל מי שאפשר:
+
+```php
+use EdenOhana\SmsFree\ClientOptions;
+use EdenOhana\SmsFree\InvalidRecipientPolicy;
+
+$client = new Sms4FreeClient(
+    Credentials::fromEnvironment(),
+    (new ClientOptions())->withInvalidRecipientPolicy(InvalidRecipientPolicy::SkipInvalid),
+);
+
+$result = $client->send('MyShop', $rowsFromCsv, $text);
+
+if ($result->hasSkippedRecipients()) {
+    $logger->warning('Left out of the send', ['numbers' => $result->skippedRecipients()]);
+}
+```
+
+הערכים שדולגו חוזרים בדיוק כפי שהתקבלו, כך שאפשר להעביר אותם ישירות לדוח למי שאחראי על הרשימה.
+שליחה שבה **אף** נמען לא שרד עדיין זורקת חריגה, כי שליחה לאף אחד היא אף פעם לא מה שהתכוונת אליו.
+
 או לעבוד ישירות מול אובייקט הערך:
 
 ```php
@@ -190,6 +215,7 @@ $options = (new ClientOptions())
     ->withTimeouts(connectTimeout: 3.0, timeout: 10.0)
     ->withMessageTruncation(false)
     ->withInternationalRecipients(true)  // אישור למספרים שאינם ישראליים
+    ->withInvalidRecipientPolicy(InvalidRecipientPolicy::SkipInvalid)
     ->withMaxMessageLength(70)
     ->withUserAgent('my-app/2.1')
     ->withCaBundlePath('/etc/ssl/certs/cacert.pem'); // לשרתים בלי מאגר תעודות
@@ -198,7 +224,7 @@ $client = new Sms4FreeClient(Credentials::fromEnvironment(), $options);
 ```
 
 ברירות המחדל: 5 שניות ל-timeout של החיבור, 15 שניות לבקשה כולה, חיתוך הודעות פעיל, נמענים ישראליים
-בלבד, ואימות TLS תמיד דלוק.
+בלבד, נמען לא תקין שפוסל את הבקשה, ואימות TLS תמיד דלוק.
 
 ### הערה על ניסיונות חוזרים
 

@@ -4,9 +4,10 @@
  * Sending to a list that came from somewhere messy: a CSV export, a form,
  * a database column filled in by hand over several years.
  *
- * The pattern: validate first, report the bad rows, then send to the rest.
- * Validation costs nothing; a rejected request costs a round trip, and in
- * some plans a credit.
+ * The point of this example is the invalid-recipient policy. By default one
+ * unusable row rejects the whole request, which is right for a verification
+ * code and wrong for a list of five hundred customers. Switch the policy and
+ * the send goes to everyone it can, then tells you who it left out.
  *
  *   SMS4FREE_USERNAME=... SMS4FREE_PASSWORD=... SMS4FREE_API_KEY=... \
  *     php examples/bulk-send.php
@@ -19,6 +20,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use EdenOhana\SmsFree\ClientOptions;
 use EdenOhana\SmsFree\Credentials;
 use EdenOhana\SmsFree\Exception\SmsFreeException;
+use EdenOhana\SmsFree\InvalidRecipientPolicy;
 use EdenOhana\SmsFree\Message;
 use EdenOhana\SmsFree\Sms4FreeClient;
 
@@ -33,45 +35,48 @@ $rows = [
 
 $client = new Sms4FreeClient(
     Credentials::fromEnvironment(),
-    // Refuse to shorten the body rather than send half a link.
-    (new ClientOptions())->withMessageTruncation(false),
+    (new ClientOptions())
+        // Deliver to the rows that are usable instead of failing on the ones
+        // that are not.
+        ->withInvalidRecipientPolicy(InvalidRecipientPolicy::SkipInvalid)
+        // But refuse to shorten the body rather than send half a link.
+        ->withMessageTruncation(false),
 );
-
-$invalid = $client->findInvalidRecipients($rows);
-
-if ($invalid !== []) {
-    fwrite(\STDERR, 'Skipping ' . count($invalid) . ' unusable row(s): ' . implode(', ', $invalid) . \PHP_EOL);
-}
-
-$deliverable = array_values(array_diff($rows, $invalid));
-
-if ($deliverable === []) {
-    fwrite(\STDERR, 'Nothing left to send.' . \PHP_EOL);
-
-    exit(1);
-}
 
 $message = Message::of('החנות סגורה מחר, יום שני. נתראה ביום שלישי!');
 
 printf(
-    'About to send a %s message of %d part(s) to %d recipient(s).%s',
+    'About to send a %s message of %d part(s).%s',
     $message->encoding()->value,
     $message->parts(),
-    count($deliverable),
-    \PHP_EOL,
+    PHP_EOL,
 );
 
 try {
-    $result = $client->send('MyShop', $deliverable, $message);
-
-    printf(
-        'Accepted: %d. Estimated credits: %d.%s',
-        $result->acceptedCount(),
-        $result->estimatedCredits(),
-        \PHP_EOL,
-    );
+    $result = $client->send('MyShop', $rows, $message);
 } catch (SmsFreeException $e) {
-    fwrite(\STDERR, 'Send failed: ' . $e->getMessage() . \PHP_EOL);
+    // Still throws when nothing in the list was usable, or when the provider
+    // refuses the request outright.
+    fwrite(STDERR, 'Send failed: ' . $e->getMessage() . PHP_EOL);
 
     exit(1);
+}
+
+printf(
+    'Sent to %d recipient(s), %d accepted, roughly %d credit(s).%s',
+    count($result->recipients()),
+    $result->acceptedCount(),
+    $result->estimatedCredits(),
+    PHP_EOL,
+);
+
+// These are people who expected a message and did not get one, so this belongs
+// in a log or a report rather than in the void.
+if ($result->hasSkippedRecipients()) {
+    fwrite(STDERR, sprintf(
+        'Skipped %d unusable row(s): %s%s',
+        count($result->skippedRecipients()),
+        implode(', ', $result->skippedRecipients()),
+        PHP_EOL,
+    ));
 }

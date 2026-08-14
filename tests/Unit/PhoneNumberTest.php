@@ -111,6 +111,22 @@ final class PhoneNumberTest extends TestCase
         }
     }
 
+    public function testPartitionKeepsTheGoodAndTheBadSeparateInOrder(): void
+    {
+        [$valid, $invalid] = PhoneNumber::partition(['054-123-4567', 'nope', '0521111111', '03-1234567']);
+
+        self::assertSame(['0541234567', '0521111111'], array_map(strval(...), $valid));
+        self::assertSame(['nope', '03-1234567'], $invalid);
+    }
+
+    public function testPartitionReturnsAnEmptyInvalidListWhenEverythingParses(): void
+    {
+        [$valid, $invalid] = PhoneNumber::partition(['054-123-4567']);
+
+        self::assertCount(1, $valid);
+        self::assertSame([], $invalid);
+    }
+
     public function testParseListPassesThroughAlreadyParsedNumbers(): void
     {
         $existing = PhoneNumber::parse('0541234567');

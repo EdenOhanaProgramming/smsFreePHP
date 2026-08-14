@@ -36,6 +36,14 @@ return [
     'truncate_long_messages' => (bool) env('SMS4FREE_TRUNCATE', true),
 
     /*
+     * What an unparseable recipient does to the request: 'reject' fails the
+     * whole send, 'skip' delivers to the rest and lists the ones left out in
+     * SendResult::skippedRecipients(). One bad row in a five hundred row
+     * export should not cancel the other 499.
+     */
+    'invalid_recipients' => env('SMS4FREE_INVALID_RECIPIENTS', 'reject'),
+
+    /*
      * Accept recipients outside Israel. Off by default, so a typo in a local
      * number is caught rather than sent abroad.
      */

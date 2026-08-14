@@ -70,6 +70,9 @@ Publish the config with `php artisan vendor:publish --tag=sms4free-config`. In t
   broken CA store.
 - OTP codes are strings, not integers, so leading zeros survive. Compare them with
   `OtpGenerator::matches()`, which is constant time.
+- One unparseable recipient rejects the whole request by default. For a bulk send, set
+  `ClientOptions::withInvalidRecipientPolicy(InvalidRecipientPolicy::SkipInvalid)` and read
+  `SendResult::skippedRecipients()`. Sending to a list where every recipient is invalid always throws.
 - Sending marketing SMS in Israel requires prior consent under the anti-spam amendment to the
   Communications Law. Do not generate bulk marketing flows without an opt-in and an opt-out.
 

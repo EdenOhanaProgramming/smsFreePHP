@@ -121,6 +121,32 @@ if ($invalid !== []) {
 }
 ```
 
+### One bad number in a list of five hundred
+
+By default an unparseable recipient rejects the whole request, which is what you want for a
+verification code: if the number is wrong, sending to nobody is the correct outcome. For a bulk send
+it is the wrong trade, so switch the policy and the message goes to everyone it can:
+
+```php
+use EdenOhana\SmsFree\ClientOptions;
+use EdenOhana\SmsFree\InvalidRecipientPolicy;
+
+$client = new Sms4FreeClient(
+    Credentials::fromEnvironment(),
+    (new ClientOptions())->withInvalidRecipientPolicy(InvalidRecipientPolicy::SkipInvalid),
+);
+
+$result = $client->send('MyShop', $rowsFromCsv, $text);
+
+if ($result->hasSkippedRecipients()) {
+    $logger->warning('Left out of the send', ['numbers' => $result->skippedRecipients()]);
+}
+```
+
+The skipped values come back exactly as they were supplied, so they can go straight into a report
+for whoever owns the list. A send where *no* recipient survives still throws, because delivering to
+nobody is never what the caller meant.
+
 Or work with the value object directly:
 
 ```php
@@ -198,6 +224,7 @@ $options = (new ClientOptions())
     ->withTimeouts(connectTimeout: 3.0, timeout: 10.0)
     ->withMessageTruncation(false)
     ->withInternationalRecipients(true)  // accept non-Israeli numbers
+    ->withInvalidRecipientPolicy(InvalidRecipientPolicy::SkipInvalid)
     ->withMaxMessageLength(70)
     ->withUserAgent('my-app/2.1')
     ->withCaBundlePath('/etc/ssl/certs/cacert.pem'); // for hosts with no CA store
@@ -206,7 +233,7 @@ $client = new Sms4FreeClient(Credentials::fromEnvironment(), $options);
 ```
 
 Defaults: a 5 second connect timeout and a 15 second overall timeout, truncation on, Israeli
-recipients only, TLS verification always on.
+recipients only, an unparseable recipient rejecting the request, and TLS verification always on.
 
 ### A note on retries
 

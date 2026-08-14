@@ -15,14 +15,16 @@ namespace EdenOhana\SmsFree;
 final class SendResult
 {
     /**
-     * @param int              $acceptedCount how many messages the provider accepted
-     * @param list<PhoneNumber> $recipients   the normalised recipients the request was sent to
+     * @param int               $acceptedCount     how many messages the provider accepted
+     * @param list<PhoneNumber> $recipients        the normalised recipients the request was sent to
+     * @param list<string>      $skippedRecipients raw values left out under InvalidRecipientPolicy::SkipInvalid
      */
     public function __construct(
         private readonly int $acceptedCount,
         private readonly array $recipients,
         private readonly Message $message,
         private readonly string $providerMessage = '',
+        private readonly array $skippedRecipients = [],
     ) {
     }
 
@@ -66,6 +68,26 @@ final class SendResult
     public function wasTruncated(): bool
     {
         return $this->message->isTruncated();
+    }
+
+    /**
+     * The recipients that could not be parsed and were left out of the
+     * request, exactly as the caller supplied them. Always empty under the
+     * default {@see InvalidRecipientPolicy::RejectRequest}, because that
+     * policy never gets as far as sending.
+     *
+     * Worth logging: these are people who expected a message and did not get one.
+     *
+     * @return list<string>
+     */
+    public function skippedRecipients(): array
+    {
+        return $this->skippedRecipients;
+    }
+
+    public function hasSkippedRecipients(): bool
+    {
+        return $this->skippedRecipients !== [];
     }
 
     /**

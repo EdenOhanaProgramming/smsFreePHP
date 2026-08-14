@@ -30,6 +30,11 @@ It lands in `config/sms4free.php` and covers the endpoint, both timeouts, the me
 whether an over-long body is truncated or rejected, whether non-Israeli recipients are allowed, and
 an optional CA bundle path.
 
+For a bulk send, the setting worth knowing about is `invalid_recipients`. It defaults to `reject`,
+where one unparseable number fails the whole request. Set `SMS4FREE_INVALID_RECIPIENTS=skip` and the
+message goes to the recipients that are valid, with the rest available from
+`SendResult::skippedRecipients()`.
+
 ## Sending directly
 
 Inject the client wherever you need it:

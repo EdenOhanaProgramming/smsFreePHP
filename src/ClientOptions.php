@@ -32,6 +32,7 @@ final class ClientOptions
      * @param bool        $allowInternational   true accepts non-Israeli recipient numbers
      * @param string|null $caBundlePath         path to a CA bundle, for hosts whose PHP has none configured
      * @param string|null $userAgent            overrides the User-Agent header sent with the request
+     * @param InvalidRecipientPolicy $invalidRecipients whether an unparseable recipient rejects the request or is skipped
      */
     public function __construct(
         private readonly string $endpoint = self::DEFAULT_ENDPOINT,
@@ -42,6 +43,7 @@ final class ClientOptions
         private readonly bool $allowInternational = false,
         private readonly ?string $caBundlePath = null,
         private readonly ?string $userAgent = null,
+        private readonly InvalidRecipientPolicy $invalidRecipients = InvalidRecipientPolicy::RejectRequest,
     ) {
         if (!filter_var($endpoint, \FILTER_VALIDATE_URL) || !str_starts_with($endpoint, 'https://')) {
             throw new InvalidArgumentException('The endpoint must be an absolute HTTPS URL.');
@@ -95,6 +97,11 @@ final class ClientOptions
         return $this->caBundlePath;
     }
 
+    public function invalidRecipientPolicy(): InvalidRecipientPolicy
+    {
+        return $this->invalidRecipients;
+    }
+
     public function userAgent(): string
     {
         return $this->userAgent ?? 'smsFreePHP/' . Sms4FreeClient::VERSION . ' (+https://github.com/EdenOhanaProgramming/smsFreePHP)';
@@ -131,6 +138,15 @@ final class ClientOptions
     }
 
     /**
+     * Decides what an unparseable recipient does to the request: reject the
+     * whole thing, or send to the rest and report what was left out.
+     */
+    public function withInvalidRecipientPolicy(InvalidRecipientPolicy $policy): self
+    {
+        return $this->with(invalidRecipients: $policy);
+    }
+
+    /**
      * Passing null restores PHP's own CA configuration.
      */
     public function withCaBundlePath(?string $path): self
@@ -144,6 +160,7 @@ final class ClientOptions
             $this->allowInternational,
             $path,
             $this->userAgent,
+            $this->invalidRecipients,
         );
     }
 
@@ -161,6 +178,7 @@ final class ClientOptions
             $this->allowInternational,
             $this->caBundlePath,
             $userAgent,
+            $this->invalidRecipients,
         );
     }
 
@@ -173,6 +191,7 @@ final class ClientOptions
         ?bool $allowInternational = null,
         ?string $caBundlePath = null,
         ?string $userAgent = null,
+        ?InvalidRecipientPolicy $invalidRecipients = null,
     ): self {
         return new self(
             $endpoint ?? $this->endpoint,
@@ -183,6 +202,7 @@ final class ClientOptions
             $allowInternational ?? $this->allowInternational,
             $caBundlePath ?? $this->caBundlePath,
             $userAgent ?? $this->userAgent,
+            $invalidRecipients ?? $this->invalidRecipients,
         );
     }
 }
