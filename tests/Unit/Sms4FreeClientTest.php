@@ -98,10 +98,10 @@ final class Sms4FreeClientTest extends TestCase
         self::assertCount(1, $result->recipients());
     }
 
-    public function testItRejectsARequestBeforeSpendingACreditOnBadInput(): void
+    public function testRejectPolicyRefusesTheWholeRequestOnBadInput(): void
     {
         $http = FakeHttpClient::respondingWith(1);
-        $client = $this->client($http);
+        $client = $this->rejecting($http);
 
         try {
             $client->send('MyShop', ['0541234567', 'nonsense'], 'hello');
@@ -255,11 +255,11 @@ final class Sms4FreeClientTest extends TestCase
         self::assertSame(0, $http->requestCount());
     }
 
-    public function testInvalidRecipientsCanBeSkippedInsteadOfRejectingTheRequest(): void
+    public function testTheDefaultPolicySkipsBadRecipientsAndSendsToTheRest(): void
     {
         $http = FakeHttpClient::respondingWith(2);
 
-        $result = $this->skipping($http)->send(
+        $result = $this->client($http)->send(
             'MyShop',
             ['054-123-4567', '03-1234567', '052 111 1111', 'nonsense'],
             'hello',
@@ -280,7 +280,7 @@ final class Sms4FreeClientTest extends TestCase
         $http = FakeHttpClient::respondingWith(1);
 
         try {
-            $this->skipping($http)->send('MyShop', ['03-1234567', 'nonsense'], 'hello');
+            $this->client($http)->send('MyShop', ['03-1234567', 'nonsense'], 'hello');
             self::fail('Expected an InvalidPhoneNumberException.');
         } catch (InvalidPhoneNumberException $e) {
             self::assertSame(['03-1234567', 'nonsense'], $e->invalidNumbers());
@@ -290,14 +290,14 @@ final class Sms4FreeClientTest extends TestCase
         self::assertSame(0, $http->requestCount());
     }
 
-    public function testTheDefaultPolicyStillRejectsTheWholeRequest(): void
+    public function testRejectPolicyBlocksTheWholeRequest(): void
     {
         $http = FakeHttpClient::respondingWith(1);
 
         $this->expectException(InvalidPhoneNumberException::class);
 
         try {
-            $this->client($http)->send('MyShop', ['0541234567', 'nonsense'], 'hello');
+            $this->rejecting($http)->send('MyShop', ['0541234567', 'nonsense'], 'hello');
         } finally {
             self::assertSame(0, $http->requestCount());
         }
@@ -314,7 +314,7 @@ final class Sms4FreeClientTest extends TestCase
 
     public function testSkippedValuesAreReportedExactlyAsTheyWereSupplied(): void
     {
-        $result = $this->skipping(FakeHttpClient::respondingWith(1))
+        $result = $this->client(FakeHttpClient::respondingWith(1))
             ->send('MyShop', ['0541234567', '  03-123-4567  '], 'hello');
 
         self::assertSame(['  03-123-4567  '], $result->skippedRecipients());
@@ -340,11 +340,11 @@ final class Sms4FreeClientTest extends TestCase
         return new Sms4FreeClient($this->credentials(), new ClientOptions(), $http);
     }
 
-    private function skipping(FakeHttpClient $http): Sms4FreeClient
+    private function rejecting(FakeHttpClient $http): Sms4FreeClient
     {
         return new Sms4FreeClient(
             $this->credentials(),
-            (new ClientOptions())->withInvalidRecipientPolicy(InvalidRecipientPolicy::SkipInvalid),
+            (new ClientOptions())->withInvalidRecipientPolicy(InvalidRecipientPolicy::RejectRequest),
             $http,
         );
     }

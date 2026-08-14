@@ -66,7 +66,7 @@ Credentials::fromEnvironment(string $prefix = 'SMS4FREE_'): self
 | `maxMessageLength` | `134` תווים | המגבלה של הספק. |
 | `truncateLongMessages` | `true` | ‏`false` הופך הודעה ארוכה מדי לחריגה. |
 | `allowInternational` | `false` | ‏`true` מאפשר נמענים שאינם ישראליים. |
-| `invalidRecipients` | `InvalidRecipientPolicy::RejectRequest` | האם נמען שלא ניתן לפענוח פוסל את הבקשה או מדולג. |
+| `invalidRecipients` | `InvalidRecipientPolicy::SkipInvalid` | האם נמען שלא ניתן לפענוח פוסל את הבקשה או מדולג. |
 | `caBundlePath` | `null` | לשרתים שבהם ל-PHP אין מאגר תעודות שמיש. חייב להיות קריא. |
 | `userAgent` | `smsFreePHP/<version>` | נשלח בכל בקשה. |
 
@@ -141,8 +141,8 @@ Message::of(string $text): self   // זורקת על הודעה ריקה או ע
 
 | ערך | התנהגות |
 |---|---|
-| `RejectRequest` (ברירת מחדל) | שום דבר לא נשלח, שום דבר לא מחויב, ו-`InvalidPhoneNumberException` מפרטת כל ערך שגוי. |
-| `SkipInvalid` | נשלח לנמענים התקינים; השאר חוזרים מ-`SendResult::skippedRecipients()`. |
+| `RejectRequest` | שום דבר לא נשלח, שום דבר לא מחויב, ו-`InvalidPhoneNumberException` מפרטת כל ערך שגוי. |
+| `SkipInvalid` (ברירת מחדל) | נשלח לנמענים התקינים; השאר חוזרים מ-`SendResult::skippedRecipients()`. |
 
 תחת `SkipInvalid`, בקשה שבה **כל** הנמענים פסולים עדיין זורקת חריגה. שליחה לאף אחד היא אף פעם לא מה
 שהמתכנת התכוון אליו, והצלחה שקטה שם הייתה מסתירה את הבעיה במקום לדווח עליה.

@@ -41,7 +41,7 @@ return [
      * SendResult::skippedRecipients(). One bad row in a five hundred row
      * export should not cancel the other 499.
      */
-    'invalid_recipients' => env('SMS4FREE_INVALID_RECIPIENTS', 'reject'),
+    'invalid_recipients' => env('SMS4FREE_INVALID_RECIPIENTS', 'skip'),
 
     /*
      * Accept recipients outside Israel. Off by default, so a typo in a local

@@ -43,7 +43,7 @@ final class ClientOptions
         private readonly bool $allowInternational = false,
         private readonly ?string $caBundlePath = null,
         private readonly ?string $userAgent = null,
-        private readonly InvalidRecipientPolicy $invalidRecipients = InvalidRecipientPolicy::RejectRequest,
+        private readonly InvalidRecipientPolicy $invalidRecipients = InvalidRecipientPolicy::SkipInvalid,
     ) {
         if (!filter_var($endpoint, \FILTER_VALIDATE_URL) || !str_starts_with($endpoint, 'https://')) {
             throw new InvalidArgumentException('The endpoint must be an absolute HTTPS URL.');

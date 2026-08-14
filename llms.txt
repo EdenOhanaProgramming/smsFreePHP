@@ -22,8 +22,9 @@ $result->acceptedCount();
 ```
 
 `send(string $senderName, iterable|string|PhoneNumber $recipients, string|Message $message)` returns
-a `SendResult` or throws. It normalises and de-duplicates recipients, rejects the whole request if
-any number is unparseable, and truncates an over-long body on a character boundary by default.
+a `SendResult` or throws. It normalises and de-duplicates recipients, skips unparseable numbers by
+default (reporting them in `SendResult::skippedRecipients()`), and truncates an over-long body on a
+character boundary.
 
 ## Laravel
 
@@ -70,9 +71,10 @@ Publish the config with `php artisan vendor:publish --tag=sms4free-config`. In t
   broken CA store.
 - OTP codes are strings, not integers, so leading zeros survive. Compare them with
   `OtpGenerator::matches()`, which is constant time.
-- One unparseable recipient rejects the whole request by default. For a bulk send, set
-  `ClientOptions::withInvalidRecipientPolicy(InvalidRecipientPolicy::SkipInvalid)` and read
-  `SendResult::skippedRecipients()`. Sending to a list where every recipient is invalid always throws.
+- Unparseable recipients are skipped by default: the message goes to the valid ones, and
+  `SendResult::skippedRecipients()` lists the rest. A send to a single invalid number still throws
+  (nobody left to send to). To reject the whole request on any bad number, set
+  `ClientOptions::withInvalidRecipientPolicy(InvalidRecipientPolicy::RejectRequest)`.
 - Sending marketing SMS in Israel requires prior consent under the anti-spam amendment to the
   Communications Law. Do not generate bulk marketing flows without an opt-in and an opt-out.
 

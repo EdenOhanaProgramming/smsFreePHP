@@ -21,7 +21,7 @@ final class ClientOptionsTest extends TestCase
         self::assertSame(134, $options->maxMessageLength());
         self::assertTrue($options->truncatesLongMessages());
         self::assertFalse($options->allowsInternational());
-        self::assertSame(InvalidRecipientPolicy::RejectRequest, $options->invalidRecipientPolicy());
+        self::assertSame(InvalidRecipientPolicy::SkipInvalid, $options->invalidRecipientPolicy());
 
         // 1.x used CURLOPT_CONNECTTIMEOUT = 0 (wait forever) and a 400 second
         // timeout, which is long enough to hang a page until the visitor gives
@@ -67,7 +67,7 @@ final class ClientOptionsTest extends TestCase
             ->withMessageTruncation(false)
             ->withInternationalRecipients(true)
             ->withUserAgent('my-app/1.0')
-            ->withInvalidRecipientPolicy(InvalidRecipientPolicy::SkipInvalid);
+            ->withInvalidRecipientPolicy(InvalidRecipientPolicy::RejectRequest);
 
         self::assertSame(1.5, $modified->connectTimeout());
         self::assertSame(2.5, $modified->timeout());
@@ -75,13 +75,13 @@ final class ClientOptionsTest extends TestCase
         self::assertFalse($modified->truncatesLongMessages());
         self::assertTrue($modified->allowsInternational());
         self::assertSame('my-app/1.0', $modified->userAgent());
-        self::assertSame(InvalidRecipientPolicy::SkipInvalid, $modified->invalidRecipientPolicy());
+        self::assertSame(InvalidRecipientPolicy::RejectRequest, $modified->invalidRecipientPolicy());
 
         // The original is untouched.
         self::assertSame(134, $original->maxMessageLength());
         self::assertTrue($original->truncatesLongMessages());
         self::assertStringContainsString('smsFreePHP/', $original->userAgent());
-        self::assertSame(InvalidRecipientPolicy::RejectRequest, $original->invalidRecipientPolicy());
+        self::assertSame(InvalidRecipientPolicy::SkipInvalid, $original->invalidRecipientPolicy());
     }
 
     public function testACustomUserAgentCanBeCleared(): void

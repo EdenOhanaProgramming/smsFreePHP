@@ -4,10 +4,9 @@
  * Sending to a list that came from somewhere messy: a CSV export, a form,
  * a database column filled in by hand over several years.
  *
- * The point of this example is the invalid-recipient policy. By default one
- * unusable row rejects the whole request, which is right for a verification
- * code and wrong for a list of five hundred customers. Switch the policy and
- * the send goes to everyone it can, then tells you who it left out.
+ * The default policy skips unparseable rows and sends to the rest, which is
+ * what you want for a bulk list. The skipped rows come back in the result so
+ * they can go into a log or a report.
  *
  *   SMS4FREE_USERNAME=... SMS4FREE_PASSWORD=... SMS4FREE_API_KEY=... \
  *     php examples/bulk-send.php
@@ -20,7 +19,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use EdenOhana\SmsFree\ClientOptions;
 use EdenOhana\SmsFree\Credentials;
 use EdenOhana\SmsFree\Exception\SmsFreeException;
-use EdenOhana\SmsFree\InvalidRecipientPolicy;
 use EdenOhana\SmsFree\Message;
 use EdenOhana\SmsFree\Sms4FreeClient;
 
@@ -35,12 +33,8 @@ $rows = [
 
 $client = new Sms4FreeClient(
     Credentials::fromEnvironment(),
-    (new ClientOptions())
-        // Deliver to the rows that are usable instead of failing on the ones
-        // that are not.
-        ->withInvalidRecipientPolicy(InvalidRecipientPolicy::SkipInvalid)
-        // But refuse to shorten the body rather than send half a link.
-        ->withMessageTruncation(false),
+    // Refuse to shorten the body rather than send half a link.
+    (new ClientOptions())->withMessageTruncation(false),
 );
 
 $message = Message::of('החנות סגורה מחר, יום שני. נתראה ביום שלישי!');
