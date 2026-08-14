@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-08-14
+
 ### Added
 
 - `InvalidRecipientPolicy`, deciding what an unparseable recipient does to a request. The default
@@ -91,6 +93,7 @@ See [UPGRADING.md](UPGRADING.md).
 - Initial release: `SMSService` with `smsAuth()`, `sendSMS()`, `generateRandomOTP()` and
   `getInvalidPhoneNumbers()`.
 
-[Unreleased]: https://github.com/EdenOhanaProgramming/smsFreePHP/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/EdenOhanaProgramming/smsFreePHP/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/EdenOhanaProgramming/smsFreePHP/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/EdenOhanaProgramming/smsFreePHP/releases/tag/v2.0.0
 [1.0.0]: https://github.com/EdenOhanaProgramming/smsFreePHP/releases/tag/v1.0.0
