@@ -31,7 +31,7 @@ use EdenOhana\SmsFree\Http\HttpResponse;
  */
 final class Sms4FreeClient
 {
-    public const VERSION = '2.0.0';
+    public const VERSION = '2.1.0';
 
     private readonly HttpClient $httpClient;
 
