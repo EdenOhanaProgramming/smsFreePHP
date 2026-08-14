@@ -1,0 +1,92 @@
+{
+    "name": "edenohana/sms-free-php",
+    "description": "A modern, typed PHP client for the SMS4Free (sms4free.co.il) HTTP API: SMS sending, Israeli phone number handling and OTP generation.",
+    "type": "library",
+    "keywords": [
+        "sms",
+        "sms4free",
+        "otp",
+        "israel",
+        "hebrew",
+        "notifications",
+        "notification-channel",
+        "laravel",
+        "php"
+    ],
+    "homepage": "https://github.com/EdenOhanaProgramming/smsFreePHP",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Eden Ohana",
+            "email": "edenohana72@gmail.com",
+            "homepage": "https://github.com/EdenOhanaProgramming"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/EdenOhanaProgramming/smsFreePHP/issues",
+        "source": "https://github.com/EdenOhanaProgramming/smsFreePHP"
+    },
+    "require": {
+        "php": ">=8.1",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.64",
+        "illuminate/notifications": "^11.0 || ^12.0",
+        "illuminate/support": "^11.0 || ^12.0",
+        "phpstan/phpstan": "^2.0",
+        "phpunit/phpunit": "^10.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "EdenOhana\\SmsFree\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "EdenOhana\\SmsFree\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test:coverage": "phpunit --coverage-text",
+        "analyse": "phpstan analyse",
+        "cs": "php-cs-fixer fix --dry-run --diff",
+        "cs:fix": "php-cs-fixer fix",
+        "check": [
+            "@cs",
+            "@analyse",
+            "@test"
+        ]
+    },
+    "scripts-descriptions": {
+        "test": "Run the PHPUnit test suite.",
+        "analyse": "Run PHPStan static analysis at the configured level.",
+        "cs": "Report coding-standard violations without changing files.",
+        "cs:fix": "Fix coding-standard violations in place.",
+        "check": "Run the full quality gate: coding standards, static analysis and tests."
+    },
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "2.x-dev"
+        },
+        "laravel": {
+            "providers": [
+                "EdenOhana\\SmsFree\\Laravel\\Sms4FreeServiceProvider"
+            ],
+            "aliases": {
+                "Sms4Free": "EdenOhana\\SmsFree\\Laravel\\Facades\\Sms4Free"
+            }
+        }
+    },
+    "suggest": {
+        "illuminate/support": "Registers the Laravel service provider and facade (^11.0 || ^12.0).",
+        "illuminate/notifications": "Enables the sms4free notification channel (^11.0 || ^12.0)."
+    }
+}

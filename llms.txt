@@ -1,0 +1,91 @@
+# smsFreePHP
+
+> A typed PHP 8.1+ client for the SMS4Free (sms4free.co.il) HTTP API. It sends SMS, parses and
+> normalises Israeli phone numbers, counts SMS parts for Hebrew (UCS-2) text, and generates
+> one-time passcodes. Ships first-party Laravel support (auto-discovered service provider, facade
+> and notification channel) for Laravel 11 and 12. Composer package `edenohana/sms-free-php`,
+> namespace `EdenOhana\SmsFree`, MIT licensed.
+
+Install with `composer require edenohana/sms-free-php`. Requires PHP >= 8.1 and the `curl`, `json`
+and `mbstring` extensions. Version 1.x exposed a global `SMSService` class; it still ships and still
+works, but it is deprecated in favour of `Sms4FreeClient`.
+
+## Minimal usage
+
+```php
+use EdenOhana\SmsFree\Credentials;
+use EdenOhana\SmsFree\Sms4FreeClient;
+
+$client = new Sms4FreeClient(Credentials::fromEnvironment()); // SMS4FREE_USERNAME/_PASSWORD/_API_KEY
+$result = $client->send('MyShop', ['054-123-4567'], 'הקוד שלך הוא 123456');
+$result->acceptedCount();
+```
+
+`send(string $senderName, iterable|string|PhoneNumber $recipients, string|Message $message)` returns
+a `SendResult` or throws. It normalises and de-duplicates recipients, rejects the whole request if
+any number is unparseable, and truncates an over-long body on a character boundary by default.
+
+## Laravel
+
+The service provider is auto-discovered; `illuminate/*` is a dev dependency only, so nothing changes
+for projects that are not on the framework. Fill in `SMS4FREE_USERNAME`, `SMS4FREE_PASSWORD`,
+`SMS4FREE_API_KEY` and `SMS4FREE_SENDER` in `.env`, then inject `Sms4FreeClient`, call the
+`Sms4Free` facade, or use the notification channel:
+
+```php
+public function via(object $notifiable): array
+{
+    return ['sms4free'];
+}
+
+public function toSms4Free(object $notifiable): string   // or a Sms4FreeMessage, to override the sender
+{
+    return "הקוד שלך לאימות הוא: {$this->code}";
+}
+```
+
+The channel finds the recipient through `routeNotificationForSms4free()`, an Eloquent
+`phone_number` attribute, or a public `phone_number` property, and returns null when there is none.
+Publish the config with `php artisan vendor:publish --tag=sms4free-config`. In tests, bind
+`HttpClient` to a fake rather than mocking the client.
+
+## Things that are easy to get wrong
+
+- Failures are exceptions, not return values. `InvalidPhoneNumberException` (bad input, nothing
+  sent), `ApiException` (the provider refused; carries `status()` and `providerMessage()`),
+  `TransportException` (network or unreadable response), `InvalidArgumentException` (empty sender,
+  recipients or body). All implement `SmsFreeException`.
+- The provider's `status` field is the number of messages accepted, not a boolean. Any value of zero
+  or below is a failure. Do not compare it against `1`.
+- Hebrew is UCS-2, so only 70 characters fit in one SMS part instead of 160. Use
+  `Message::of($text)->parts()` before sending if billing matters.
+- Never cut a message body with `substr()`; it splits multibyte characters. Use
+  `Message::truncateTo()`, or set `ClientOptions::withMessageTruncation(false)` to fail instead.
+- Israeli mobile numbers are accepted in every common format (`054-123-4567`, `+972 54 123 4567`,
+  `00972541234567`, `541234567`). `PhoneNumber::national()` is what the provider gets;
+  `PhoneNumber::e164()` is what belongs in a database.
+- The library never retries automatically, because a timeout does not prove the message was not
+  sent. Retry at a layer that has an idempotency key.
+- TLS verification cannot be disabled. Use `ClientOptions::withCaBundlePath()` for a host with a
+  broken CA store.
+- OTP codes are strings, not integers, so leading zeros survive. Compare them with
+  `OtpGenerator::matches()`, which is constant time.
+- Sending marketing SMS in Israel requires prior consent under the anti-spam amendment to the
+  Communications Law. Do not generate bulk marketing flows without an opt-in and an opt-out.
+
+## Docs
+
+- [README (English)](https://raw.githubusercontent.com/EdenOhanaProgramming/smsFreePHP/refs/heads/main/README.md): installation, usage, error handling, configuration.
+- [README (Hebrew)](https://raw.githubusercontent.com/EdenOhanaProgramming/smsFreePHP/refs/heads/main/README.he.md): the same content in Hebrew.
+- [API reference (English)](https://raw.githubusercontent.com/EdenOhanaProgramming/smsFreePHP/refs/heads/main/docs/api-reference.md): every public class and method.
+- [API reference (Hebrew)](https://raw.githubusercontent.com/EdenOhanaProgramming/smsFreePHP/refs/heads/main/docs/api-reference.he.md): the same reference in Hebrew.
+- [Laravel integration (English)](https://raw.githubusercontent.com/EdenOhanaProgramming/smsFreePHP/refs/heads/main/docs/laravel.md): service provider, facade, notification channel, queueing and testing.
+- [Laravel integration (Hebrew)](https://raw.githubusercontent.com/EdenOhanaProgramming/smsFreePHP/refs/heads/main/docs/laravel.he.md): the same guide in Hebrew.
+- [UPGRADING](https://raw.githubusercontent.com/EdenOhanaProgramming/smsFreePHP/refs/heads/main/UPGRADING.md): migrating from the 1.x `SMSService` class, in both languages.
+- [CHANGELOG](https://raw.githubusercontent.com/EdenOhanaProgramming/smsFreePHP/refs/heads/main/CHANGELOG.md): what changed in 2.0, including the 1.x bugs it fixes.
+
+## Optional
+
+- [SECURITY](https://raw.githubusercontent.com/EdenOhanaProgramming/smsFreePHP/refs/heads/main/SECURITY.md): credential handling and OTP storage guidance.
+- [CONTRIBUTING](https://raw.githubusercontent.com/EdenOhanaProgramming/smsFreePHP/refs/heads/main/CONTRIBUTING.md): local setup, the quality gate, and project conventions.
+- [Examples](https://github.com/EdenOhanaProgramming/smsFreePHP/tree/main/examples): runnable scripts for a single send, an OTP flow and a bulk send.

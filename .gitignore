@@ -1,0 +1,16 @@
+/vendor/
+/composer.lock
+/.phpunit.cache/
+/.php-cs-fixer.cache
+/.phpstan.cache/
+/phpunit.xml
+/phpstan.neon
+/.php-cs-fixer.php
+/coverage/
+.DS_Store
+.idea/
+.vscode/
+*.log
+.env
+.env.*
+!.env.example
