@@ -1,82 +1,132 @@
 <?php
-set_time_limit(0);
 
+/**
+ * Backwards-compatibility layer for smsFreePHP 1.x.
+ *
+ * Version 2 moved to a namespaced, exception-based API
+ * ({@see \EdenOhana\SmsFree\Sms4FreeClient}). This file keeps the old
+ * `SMSService` class working — same method names, same return values — so an
+ * existing project can upgrade the library without changing a line of code,
+ * and migrate at its own pace.
+ *
+ * @deprecated since 2.0, use \EdenOhana\SmsFree\Sms4FreeClient instead.
+ *             See UPGRADING.md for the (short) migration guide.
+ */
+
+declare(strict_types=1);
+
+use EdenOhana\SmsFree\Credentials;
+use EdenOhana\SmsFree\Exception\ApiException;
+use EdenOhana\SmsFree\Exception\InvalidPhoneNumberException;
+use EdenOhana\SmsFree\Exception\SmsFreeException;
+use EdenOhana\SmsFree\Otp\OtpGenerator;
+use EdenOhana\SmsFree\PhoneNumber;
+use EdenOhana\SmsFree\Sms4FreeClient;
+
+// Works whether the project uses Composer or simply requires this file
+// directly: only when no autoloader can find the client do we register ours.
+if (!class_exists(Sms4FreeClient::class)) {
+    $composerAutoloader = __DIR__ . '/vendor/autoload.php';
+
+    require_once is_file($composerAutoloader) ? $composerAutoloader : __DIR__ . '/src/autoload.php';
+}
+
+/**
+ * @deprecated since 2.0, use \EdenOhana\SmsFree\Sms4FreeClient instead.
+ */
 class SMSService
 {
-    private string $username;
-    private string $password;
-    private string $api_token;
+    private ?Credentials $credentials = null;
 
-    public function smsAuth(string $username, string $password, string $api_token)
+    private static bool $deprecationNoticeEmitted = false;
+
+    public function __construct()
     {
-        $this->username = $username;
-        $this->password = $password;
-        $this->api_token = $api_token;
+        if (!self::$deprecationNoticeEmitted) {
+            self::$deprecationNoticeEmitted = true;
+
+            @trigger_error(
+                'SMSService is deprecated since smsFreePHP 2.0 and will be removed in 3.0. '
+                . 'Use EdenOhana\SmsFree\Sms4FreeClient instead — see UPGRADING.md.',
+                \E_USER_DEPRECATED,
+            );
+        }
     }
 
+    /**
+     * Stores the account details used by {@see self::sendSMS()}.
+     */
+    public function smsAuth(string $username, string $password, string $api_token): void
+    {
+        $this->credentials = new Credentials($username, $password, $api_token);
+    }
+
+    /**
+     * Sends a message and returns `true` on success or a Hebrew error string
+     * on failure, exactly as version 1 did.
+     *
+     * @param array<int, string> $recipientsList
+     *
+     * @return true|string
+     */
     public function sendSMS(string $senderName, array $recipientsList, string $message)
     {
-        $errorMsg = "";
-
-        if(!strlen($senderName) || !strlen($message)) $errorMsg = "שולח או הודעה ריקים.";
-        else {
-            if (!count($recipientsList)) $errorMsg = "לא הוזנו נמענים להודעה.";
-            else {
-                $invalidNumbers = $this->getInvalidPhoneNumbers($recipientsList);
-                if(count($invalidNumbers)) $errorMsg = "המספרים הבאים אינם תקינים: ".implode(", ", $invalidNumbers).".";
-            }
+        if ($this->credentials === null) {
+            return 'לא הוזנו פרטי התחברות. יש לקרוא ל-smsAuth לפני שליחת הודעה.';
         }
 
-        if(empty($errorMsg)) {
-            $postData = array(
-                'key' => $this->api_token,
-                'user' => $this->username,
-                'pass' => $this->password,
-                'sender' => $senderName,
-                'recipient' => implode(",", $recipientsList),
-                'msg' => strlen($message) > 134 ? substr($message, 0, 134) : $message
-            );
-    
-            $ch = curl_init("https://api.sms4free.co.il/ApiSMS/v2/SendSMS");
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 400);
-    
-            try {
-                $data = json_decode(curl_exec($ch), false);
-                $curl_errno = curl_errno($ch);
-                $curl_error = curl_error($ch);
-                curl_close($ch);
-    
-                if ($curl_errno) {
-                    $errorMsg = "שגיאת CURL בעת שליחת ה-SMS: {$curl_error}";
-                } else if ($data->status !== 1) {
-                    $errorMsg = "שגיאת שירות בעת שליחת ה-SMS: {$data->message}";
-                } else {
-                    return true;
-                }
-            } catch (\Throwable $th) {
-                $errorMsg = "שגיאת שרת פנימית בעת שליחת ה-SMS: {$th->getMessage()}";
-            }
+        if ($senderName === '' || $message === '') {
+            return 'שולח או הודעה ריקים.';
         }
 
-        return $errorMsg;
+        if ($recipientsList === []) {
+            return 'לא הוזנו נמענים להודעה.';
+        }
+
+        try {
+            (new Sms4FreeClient($this->credentials))->send($senderName, $recipientsList, $message);
+
+            return true;
+        } catch (InvalidPhoneNumberException $e) {
+            return 'המספרים הבאים אינם תקינים: ' . implode(', ', $e->invalidNumbers()) . '.';
+        } catch (ApiException $e) {
+            return 'שגיאת שירות בעת שליחת ה-SMS: ' . $e->providerMessage();
+        } catch (SmsFreeException $e) {
+            return 'שגיאה בעת שליחת ה-SMS: ' . $e->getMessage();
+        } catch (\Throwable $e) {
+            return 'שגיאת שרת פנימית בעת שליחת ה-SMS: ' . $e->getMessage();
+        }
     }
 
-    public function generateRandomOTP()
+    /**
+     * @return int a six digit code
+     *
+     * @see OtpGenerator for a version that returns a string and therefore
+     *      keeps leading zeros
+     */
+    public function generateRandomOTP(): int
     {
+        // Deliberately not delegating to OtpGenerator: version 1 promised an
+        // integer, and casting "042317" to int would hand back a five digit
+        // code. The range below is the one 1.x used.
         return random_int(100000, 999999);
     }
 
-    public function getInvalidPhoneNumbers(array $phoneNumbers) {
-        $invalidNumbers = [];
+    /**
+     * @param array<int, string> $phoneNumbers
+     *
+     * @return array<int, string> the entries that are not valid Israeli mobile numbers
+     */
+    public function getInvalidPhoneNumbers(array $phoneNumbers): array
+    {
+        $invalid = [];
+
         foreach ($phoneNumbers as $phoneNumber) {
-            $phoneNumber = preg_replace('/\D/', '', $phoneNumber);
-            if (!preg_match('/^(05\d{8}|(\+972)?5\d{8})$/', $phoneNumber)) $invalidNumbers[] = $phoneNumber;
+            if (PhoneNumber::tryParse($phoneNumber) === null) {
+                $invalid[] = $phoneNumber;
+            }
         }
-        return $invalidNumbers;
+
+        return $invalid;
     }
 }
-?>
