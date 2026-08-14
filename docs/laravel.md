@@ -5,8 +5,8 @@
 The package ships a service provider, a facade and a notification channel. Laravel discovers the
 provider automatically, so there is nothing to register by hand.
 
-Supported: Laravel 9, 10, 11 and 12. Applications that do not use Laravel are unaffected, since
-`illuminate/*` is only a development dependency here.
+Supported: Laravel 11 and 12, the versions still receiving fixes. Applications that do not use
+Laravel are unaffected, since `illuminate/*` is only a development dependency here.
 
 ## Setup
 

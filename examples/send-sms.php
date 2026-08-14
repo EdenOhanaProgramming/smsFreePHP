@@ -33,7 +33,7 @@ try {
     );
 
     printf(
-        "Sent to %s: %d message(s) accepted, %d part(s) each.%s",
+        'Sent to %s: %d message(s) accepted, %d part(s) each.%s',
         implode(', ', $result->recipientNumbers()),
         $result->acceptedCount(),
         $result->message()->parts(),

@@ -35,7 +35,7 @@ See [UPGRADING.md](UPGRADING.md).
 - Documentation in English and Hebrew, a bilingual API reference, and runnable examples.
 - `src/autoload.php`, a standalone PSR-4 autoloader for projects that do not use Composer.
 - Laravel support: an auto-discovered service provider, a publishable config file, a `Sms4Free`
-  facade and an `sms4free` notification channel, for Laravel 9 through 12. `illuminate/*` stays a
+  facade and an `sms4free` notification channel, for Laravel 11 and 12. `illuminate/*` stays a
   development dependency, so nothing changes for projects that do not use the framework.
 
 ### Fixed

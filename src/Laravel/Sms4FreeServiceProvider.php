@@ -34,9 +34,9 @@ final class Sms4FreeServiceProvider extends ServiceProvider
 
             return new ClientOptions(
                 endpoint: self::string($config, 'endpoint', ClientOptions::DEFAULT_ENDPOINT),
-                connectTimeout: (float) ($config['connect_timeout'] ?? 5.0),
-                timeout: (float) ($config['timeout'] ?? 15.0),
-                maxMessageLength: (int) ($config['max_message_length'] ?? ClientOptions::DEFAULT_MAX_MESSAGE_LENGTH),
+                connectTimeout: self::float($config, 'connect_timeout', 5.0),
+                timeout: self::float($config, 'timeout', 15.0),
+                maxMessageLength: self::int($config, 'max_message_length', ClientOptions::DEFAULT_MAX_MESSAGE_LENGTH),
                 truncateLongMessages: (bool) ($config['truncate_long_messages'] ?? true),
                 allowInternational: (bool) ($config['allow_international'] ?? false),
                 caBundlePath: self::nullableString($config, 'ca_bundle'),
@@ -131,6 +131,26 @@ final class Sms4FreeServiceProvider extends ServiceProvider
         $value = $config[$key] ?? null;
 
         return \is_scalar($value) ? (string) $value : $default;
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    private static function float(array $config, string $key, float $default): float
+    {
+        $value = $config[$key] ?? null;
+
+        return is_numeric($value) ? (float) $value : $default;
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    private static function int(array $config, string $key, int $default): int
+    {
+        $value = $config[$key] ?? null;
+
+        return is_numeric($value) ? (int) $value : $default;
     }
 
     /**

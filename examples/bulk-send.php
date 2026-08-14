@@ -40,7 +40,7 @@ $client = new Sms4FreeClient(
 $invalid = $client->findInvalidRecipients($rows);
 
 if ($invalid !== []) {
-    fwrite(\STDERR, 'Skipping ' . \count($invalid) . ' unusable row(s): ' . implode(', ', $invalid) . \PHP_EOL);
+    fwrite(\STDERR, 'Skipping ' . count($invalid) . ' unusable row(s): ' . implode(', ', $invalid) . \PHP_EOL);
 }
 
 $deliverable = array_values(array_diff($rows, $invalid));
@@ -54,10 +54,10 @@ if ($deliverable === []) {
 $message = Message::of('החנות סגורה מחר, יום שני. נתראה ביום שלישי!');
 
 printf(
-    "About to send a %s message of %d part(s) to %d recipient(s).%s",
+    'About to send a %s message of %d part(s) to %d recipient(s).%s',
     $message->encoding()->value,
     $message->parts(),
-    \count($deliverable),
+    count($deliverable),
     \PHP_EOL,
 );
 
@@ -65,7 +65,7 @@ try {
     $result = $client->send('MyShop', $deliverable, $message);
 
     printf(
-        "Accepted: %d. Estimated credits: %d.%s",
+        'Accepted: %d. Estimated credits: %d.%s',
         $result->acceptedCount(),
         $result->estimatedCredits(),
         \PHP_EOL,

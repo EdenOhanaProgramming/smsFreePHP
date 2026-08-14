@@ -18,8 +18,8 @@ use Illuminate\Support\Facades\Facade;
  * Sms4Free::send('MyShop', ['054-123-4567'], 'ההזמנה שלך יצאה לדרך');
  * ```
  *
- * @method static SendResult send(string $senderName, iterable|string|PhoneNumber $recipients, string|Message $message)
- * @method static list<string> findInvalidRecipients(iterable $recipients)
+ * @method static SendResult send(string $senderName, iterable<string|PhoneNumber>|string|PhoneNumber $recipients, string|Message $message)
+ * @method static list<string> findInvalidRecipients(iterable<string|PhoneNumber> $recipients)
  * @method static ClientOptions options()
  *
  * @see Sms4FreeClient

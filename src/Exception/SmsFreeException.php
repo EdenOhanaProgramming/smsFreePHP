@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace EdenOhana\SmsFree\Exception;
 
-use Throwable;
-
 /**
  * Marker interface implemented by every exception thrown by this library.
  *
@@ -20,6 +18,6 @@ use Throwable;
  * }
  * ```
  */
-interface SmsFreeException extends Throwable
+interface SmsFreeException extends \Throwable
 {
 }

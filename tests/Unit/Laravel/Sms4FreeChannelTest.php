@@ -112,7 +112,7 @@ final class Sms4FreeChannelTest extends TestCase
         $http = FakeHttpClient::respondingWith(1);
         $channel = $this->channel($http, 'MyShop');
 
-        $notifiable = new class(PhoneNumber::parse('054-123-4567')) {
+        $notifiable = new class (PhoneNumber::parse('054-123-4567')) {
             public function __construct(private readonly PhoneNumber $phone)
             {
             }

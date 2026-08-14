@@ -248,7 +248,7 @@ $client = new Sms4FreeClient($credentials, new ClientOptions(), new GuzzleTransp
 ## Laravel
 
 The package ships a service provider, a facade and a notification channel, discovered automatically
-by Laravel 9 through 12. Fill in `.env` and you can send:
+by Laravel 11 and 12. Fill in `.env` and you can send:
 
 ```php
 // Notification

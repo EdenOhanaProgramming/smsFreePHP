@@ -105,9 +105,9 @@ final class PhoneNumber implements \Stringable
      *
      * @param iterable<string|self> $numbers
      *
-     * @return list<self>
-     *
      * @throws InvalidPhoneNumberException listing all values that failed to parse
+     *
+     * @return list<self>
      */
     public static function parseList(iterable $numbers, bool $allowInternational = false): array
     {

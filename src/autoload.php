@@ -23,7 +23,7 @@ spl_autoload_register(static function (string $class): void {
         return;
     }
 
-    $relative = substr($class, \strlen($prefix));
+    $relative = substr($class, strlen($prefix));
     $path = __DIR__ . \DIRECTORY_SEPARATOR . str_replace('\\', \DIRECTORY_SEPARATOR, $relative) . '.php';
 
     if (is_file($path)) {

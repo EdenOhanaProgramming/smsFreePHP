@@ -41,6 +41,14 @@ jobs:
       - name: Validate composer.json
         run: composer validate --strict
 
+      # illuminate/notifications needs PHP 8.2 from v11 on, and its v9 and v10
+      # lines are blocked by a security advisory, so nothing is installable on
+      # PHP 8.1. The library itself does not depend on Laravel, and the channel
+      # tests never touch a framework class, so the suite still covers them.
+      - name: Drop the Laravel dev dependencies on PHP 8.1
+        if: matrix.php == '8.1'
+        run: composer remove --dev illuminate/support illuminate/notifications --no-update
+
       - name: Install dependencies
         uses: ramsey/composer-install@v3
         with:

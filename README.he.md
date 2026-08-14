@@ -238,7 +238,7 @@ $client = new Sms4FreeClient($credentials, new ClientOptions(), new GuzzleTransp
 
 ## Laravel
 
-החבילה כוללת service provider,‏ facade ו-notification channel, שנטענים אוטומטית ב-Laravel 9 עד 12.
+החבילה כוללת service provider,‏ facade ו-notification channel, שנטענים אוטומטית ב-Laravel 11 ו-12.
 ממלאים את `.env` ואפשר לשלוח:
 
 ```php

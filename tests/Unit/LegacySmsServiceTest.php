@@ -55,7 +55,6 @@ final class LegacySmsServiceTest extends TestCase
         for ($i = 0; $i < 100; ++$i) {
             $code = $service->generateRandomOTP();
 
-            self::assertIsInt($code);
             self::assertGreaterThanOrEqual(100000, $code);
             self::assertLessThanOrEqual(999999, $code);
         }

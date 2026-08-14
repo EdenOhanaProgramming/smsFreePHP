@@ -3,7 +3,7 @@
 > A typed PHP 8.1+ client for the SMS4Free (sms4free.co.il) HTTP API. It sends SMS, parses and
 > normalises Israeli phone numbers, counts SMS parts for Hebrew (UCS-2) text, and generates
 > one-time passcodes. Ships first-party Laravel support (auto-discovered service provider, facade
-> and notification channel) for Laravel 9 to 12. Composer package `edenohana/sms-free-php`,
+> and notification channel) for Laravel 11 and 12. Composer package `edenohana/sms-free-php`,
 > namespace `EdenOhana\SmsFree`, MIT licensed.
 
 Install with `composer require edenohana/sms-free-php`. Requires PHP >= 8.1 and the `curl`, `json`

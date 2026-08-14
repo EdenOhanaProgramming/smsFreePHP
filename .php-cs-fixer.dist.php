@@ -17,7 +17,8 @@ return (new PhpCsFixer\Config())
         'native_function_invocation' => ['include' => ['@compiler_optimized'], 'scope' => 'namespaced'],
         'no_unused_imports' => true,
         'ordered_imports' => ['sort_algorithm' => 'alpha'],
-        'phpdoc_align' => ['align' => 'left'],
+        // phpdoc_align is deliberately absent: it flattens the column alignment
+        // in multi-parameter docblocks, which is there to make them readable.
         'phpdoc_order' => true,
         'phpdoc_separation' => true,
         'single_quote' => true,
