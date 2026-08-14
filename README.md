@@ -7,7 +7,7 @@
 A modern, typed PHP client for the [SMS4Free](https://www.sms4free.co.il/) HTTP API: sending SMS,
 handling Israeli phone numbers, and generating one-time passcodes.
 
-**🇮🇱 [README בעברית](README.he.md)** | [API reference](docs/api-reference.md) | [Upgrading from 1.x](UPGRADING.md)
+**🇮🇱 [README בעברית](README.he.md)** | [API reference](docs/api-reference.md) | [Laravel](docs/laravel.md) | [Upgrading from 1.x](UPGRADING.md)
 
 ---
 
@@ -244,6 +244,27 @@ final class GuzzleTransport implements HttpClient
 
 $client = new Sms4FreeClient($credentials, new ClientOptions(), new GuzzleTransport());
 ```
+
+## Laravel
+
+The package ships a service provider, a facade and a notification channel, discovered automatically
+by Laravel 9 through 12. Fill in `.env` and you can send:
+
+```php
+// Notification
+public function via(object $notifiable): array
+{
+    return ['sms4free'];
+}
+
+public function toSms4Free(object $notifiable): string
+{
+    return "הקוד שלך לאימות הוא: {$this->code}";
+}
+```
+
+[docs/laravel.md](docs/laravel.md) covers the config file, where the channel looks for a phone
+number, queued notifications and testing.
 
 ## Upgrading from 1.x
 

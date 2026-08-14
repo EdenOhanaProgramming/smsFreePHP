@@ -45,6 +45,8 @@ any number is unparseable, and truncates an over-long body on a character bounda
   broken CA store.
 - OTP codes are strings, not integers, so leading zeros survive. Compare them with
   `OtpGenerator::matches()`, which is constant time.
+- On Laravel, the service provider is auto-discovered. Use the `sms4free` notification channel with a
+  `toSms4Free()` method on the notification, and bind `HttpClient` to a fake in tests.
 
 ## Docs
 
@@ -52,6 +54,8 @@ any number is unparseable, and truncates an over-long body on a character bounda
 - [README (Hebrew)](https://raw.githubusercontent.com/EdenOhanaProgramming/smsFreePHP/refs/heads/main/README.he.md): the same content in Hebrew.
 - [API reference (English)](https://raw.githubusercontent.com/EdenOhanaProgramming/smsFreePHP/refs/heads/main/docs/api-reference.md): every public class and method.
 - [API reference (Hebrew)](https://raw.githubusercontent.com/EdenOhanaProgramming/smsFreePHP/refs/heads/main/docs/api-reference.he.md): the same reference in Hebrew.
+- [Laravel integration (English)](https://raw.githubusercontent.com/EdenOhanaProgramming/smsFreePHP/refs/heads/main/docs/laravel.md): service provider, facade, notification channel, queueing and testing.
+- [Laravel integration (Hebrew)](https://raw.githubusercontent.com/EdenOhanaProgramming/smsFreePHP/refs/heads/main/docs/laravel.he.md): the same guide in Hebrew.
 - [UPGRADING](https://raw.githubusercontent.com/EdenOhanaProgramming/smsFreePHP/refs/heads/main/UPGRADING.md): migrating from the 1.x `SMSService` class, in both languages.
 - [CHANGELOG](https://raw.githubusercontent.com/EdenOhanaProgramming/smsFreePHP/refs/heads/main/CHANGELOG.md): what changed in 2.0, including the 1.x bugs it fixes.
 

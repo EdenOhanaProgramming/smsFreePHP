@@ -1,6 +1,6 @@
 # תיעוד ה-API
 
-[עברית](api-reference.he.md) | [English](api-reference.md) | [חזרה ל-README](../README.he.md)
+[עברית](api-reference.he.md) | [English](api-reference.md) | [Laravel](laravel.he.md) | [חזרה ל-README](../README.he.md)
 
 כל המחלקות נמצאות ב-namespace‏ `EdenOhana\SmsFree`, אלא אם צוין אחרת.
 

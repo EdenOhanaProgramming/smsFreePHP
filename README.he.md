@@ -7,7 +7,7 @@
 ספריית PHP מודרנית ומוקפדת לעבודה מול ה-API של [SMS4Free](https://www.sms4free.co.il/): שליחת הודעות
 SMS, טיפול במספרי טלפון ישראליים ויצירת קודי אימות חד-פעמיים.
 
-**🇬🇧 [README in English](README.md)** | [תיעוד ה-API](docs/api-reference.he.md) | [שדרוג מגרסה 1.x](UPGRADING.md)
+**🇬🇧 [README in English](README.md)** | [תיעוד ה-API](docs/api-reference.he.md) | [Laravel](docs/laravel.he.md) | [שדרוג מגרסה 1.x](UPGRADING.md)
 
 ---
 
@@ -235,6 +235,27 @@ final class GuzzleTransport implements HttpClient
 
 $client = new Sms4FreeClient($credentials, new ClientOptions(), new GuzzleTransport());
 ```
+
+## Laravel
+
+החבילה כוללת service provider,‏ facade ו-notification channel, שנטענים אוטומטית ב-Laravel 9 עד 12.
+ממלאים את `.env` ואפשר לשלוח:
+
+```php
+// Notification
+public function via(object $notifiable): array
+{
+    return ['sms4free'];
+}
+
+public function toSms4Free(object $notifiable): string
+{
+    return "הקוד שלך לאימות הוא: {$this->code}";
+}
+```
+
+[docs/laravel.he.md](docs/laravel.he.md) מכסה את קובץ ההגדרות, איפה הערוץ מחפש מספר טלפון, התראות
+בתור, ובדיקות.
 
 ## שדרוג מגרסה 1.x
 

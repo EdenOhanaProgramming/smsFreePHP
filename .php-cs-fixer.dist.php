@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 $finder = PhpCsFixer\Finder::create()
     ->in([__DIR__ . '/src', __DIR__ . '/tests', __DIR__ . '/examples'])
-    ->append([__DIR__ . '/SMSService.php', __FILE__]);
+    ->append([__DIR__ . '/SMSService.php', __DIR__ . '/config/sms4free.php', __FILE__]);
 
 return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)

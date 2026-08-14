@@ -1,6 +1,6 @@
 # API reference
 
-[English](api-reference.md) | [עברית](api-reference.he.md) | [Back to the README](../README.md)
+[English](api-reference.md) | [עברית](api-reference.he.md) | [Laravel](laravel.md) | [Back to the README](../README.md)
 
 Every class lives in the `EdenOhana\SmsFree` namespace unless stated otherwise.
 
